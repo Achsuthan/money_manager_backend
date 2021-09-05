@@ -8,5 +8,12 @@ public class Helper {
         java.util.regex.Matcher m = p.matcher(email);
         return m.matches();
 	}
+	
+	public static String nextId(String lastId, String key) {
+		String id = lastId.substring(key.length() + 1, lastId.length());
+		Integer intId = Integer.parseInt(id);
+		intId = intId + 1;
+		return key + "-" + intId;
+	}
 
 }
