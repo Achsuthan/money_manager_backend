@@ -3,6 +3,8 @@ package unitls;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import constants.Constants;
+
 public class ApiResponseHandler {
 	
 	public static String apiResponse(ResponseType responseType)  {
@@ -65,6 +67,13 @@ public class ApiResponseHandler {
 			json.put("status", Constants.failure);
 			json.put("code", 500);
 			json.put("message", Constants.serverErrorMessage);
+			return json;
+		}
+		case PAGENOTFOUND: {
+			JSONObject json = new JSONObject();
+			json.put("status", Constants.failure);
+			json.put("code", 404);
+			json.put("message", Constants.pageNotFound);
 			return json;
 		}
 		}
