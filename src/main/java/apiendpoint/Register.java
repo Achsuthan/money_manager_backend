@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import database.User;
 import unitls.ApiResponseHandler;
+import unitls.Pair;
 import unitls.ResponseType;
 
 /**
@@ -44,11 +45,13 @@ public class Register extends HttpServlet {
 			
 			if(email != null && password != null && name != null) {
 				User user = new User();
-				response.setStatus(response.SC_OK);
-				out.print(user.register(email, name, password));
+				response.setStatus(HttpServletResponse.SC_OK);
+				Pair<Integer, String> registerOutput = user.register(email, name, password);
+				response.setStatus(registerOutput.getKey());
+				out.print(registerOutput.getValue());
 			}
 			else {
-				response.setStatus(response.SC_BAD_REQUEST);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 			}
 			

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import database.User;
 import unitls.ApiResponseHandler;
+import unitls.Pair;
 import unitls.ResponseType;
 
 /**
@@ -44,12 +45,14 @@ public class Login extends HttpServlet {
 			String password = request.getParameter("password");
 			
 			if(email != null && password != null) {
-				response.setStatus(response.SC_OK);
+				response.setStatus(HttpServletResponse.SC_OK);
 				User user = new User();
-				out.print(user.login(email, password));
+				Pair<Integer, String> loginOutput = user.login(email, password);
+				response.setStatus(loginOutput.getKey());
+				out.print(loginOutput.getValue());
 			}
 			else {
-				response.setStatus(response.SC_BAD_REQUEST);
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 			}
 			
