@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import constants.UserConstants;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
+import unitls.Pair;
 import unitls.ResponseType;
 
 public class User extends DatabaseConnector {
@@ -22,30 +23,30 @@ public class User extends DatabaseConnector {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public String register(String email, String name, String password) {
+	public Pair<Integer, String> register(String email, String name, String password) {
 		try {
 			String lastId = getLastUser();
 			if(lastId != "") {
 				if(checkEmailExisit(email)) {
 					remove();
-	            	return ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.emailAlreadyExist);
+	            	return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.emailAlreadyExist));
 				}
 				else {
-					return registerUser(Helper.nextId(lastId, "USR"), email, name, password);
+					return new Pair<Integer, String>(200 ,registerUser(Helper.nextId(lastId, "USR"), email, name, password));
 				}
 			}
 			else {
-				return registerUser(UserConstants.firstUserId, email, name, password);
+				return new Pair<Integer, String>(200 ,registerUser(UserConstants.firstUserId, email, name, password));
 			}
 			
         } catch (Exception e) {
         	remove();
-            return ApiResponseHandler.apiResponse(ResponseType.SERVERERROR);
+            return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
         }
 	}
 	
-	public String login(String email, String password) {
-    	boolean status = false;
+	public Pair<Integer, String> login(String email, String password) {
+		
         try {
             String selectStatement = "select * " + "from user where email = ?";
             
@@ -63,24 +64,24 @@ public class User extends DatabaseConnector {
             		body.put("email", rs.getString("email"));
             		prepStmt.close();
             		remove();
-            		return ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.loginSuccessfully, body);
+            		return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.loginSuccessfully, body));
             	}
             	else {
             		prepStmt.close();
             		remove();
-            		return ApiResponseHandler.apiResponse(ResponseType.SERVERERROR);
+            		return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.loginFailed));
             	}
             } 
             else {
             	prepStmt.close();
             	remove();
-            	return ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.loginFailed);
+            	return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.loginFailed));
             }
            
         } catch (Exception ex) {
         	remove();
         	System.out.println(ex);
-            return ApiResponseHandler.apiResponse(ResponseType.SERVERERROR);
+            return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
         }
     }
 	
