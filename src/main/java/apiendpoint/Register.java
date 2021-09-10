@@ -9,8 +9,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import constants.UserConstants;
 import database.User;
 import unitls.ApiResponseHandler;
+import unitls.Helper;
+import unitls.LogsHandler;
 import unitls.Pair;
 import unitls.ResponseType;
 
@@ -44,13 +47,26 @@ public class Register extends HttpServlet {
 			String name = request.getParameter("name");
 			
 			if(email != null && password != null && name != null) {
-				User user = new User();
-				response.setStatus(HttpServletResponse.SC_OK);
-				Pair<Integer, String> registerOutput = user.register(email, name, password);
-				response.setStatus(registerOutput.getKey());
-				out.print(registerOutput.getValue());
+				
+				if(Helper.isEmailValid(email)) {
+					
+					LogsHandler.logs();
+					
+					User user = new User();
+					response.setStatus(HttpServletResponse.SC_OK);
+					Pair<Integer, String> registerOutput = user.register(email, name, password);
+					response.setStatus(registerOutput.getKey());
+					out.print(registerOutput.getValue());
+				}
+				else {
+					
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.emailForatRequired));
+				}
+				
 			}
 			else {
+				
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 			}
