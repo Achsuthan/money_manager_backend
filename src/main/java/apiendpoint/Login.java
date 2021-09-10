@@ -8,8 +8,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
+import constants.UserConstants;
 import database.User;
 import unitls.ApiResponseHandler;
+import unitls.Helper;
+import unitls.LogsHandler;
 import unitls.Pair;
 import unitls.ResponseType;
 
@@ -45,13 +49,24 @@ public class Login extends HttpServlet {
 			String password = request.getParameter("password");
 			
 			if(email != null && password != null) {
-				response.setStatus(HttpServletResponse.SC_OK);
-				User user = new User();
-				Pair<Integer, String> loginOutput = user.login(email, password);
-				response.setStatus(loginOutput.getKey());
-				out.print(loginOutput.getValue());
+				
+				if(Helper.isEmailValid(email)) {
+					
+					LogsHandler.logs();
+					
+					User user = new User();
+					Pair<Integer, String> loginOutput = user.login(email, password);
+					response.setStatus(loginOutput.getKey());
+					out.print(loginOutput.getValue());
+				}
+				else {
+					
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.emailForatRequired));
+				}
 			}
 			else {
+				
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 			}
@@ -61,9 +76,6 @@ public class Login extends HttpServlet {
 		catch(Exception e) {
 			throw new ServletException(e);
 		}
-		
-	      
-        
 	}
 
 }
