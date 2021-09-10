@@ -27,6 +27,17 @@ public class ApiResponseHandler {
 		}
 	}
 	
+	public static String apiResponse(ResponseType responseType, JSONObject bodyJson)  {
+		try {
+			JSONObject response = getCommonResponse(responseType);
+			response.putOpt("body", bodyJson);
+			return response.toString();
+		}
+		catch(Exception e) {
+			return "";
+		}
+	}
+	
 	public static String apiResponse(ResponseType responseType, String message, JSONObject bodyJson)  {
 		try {
 			JSONObject response = getCommonResponse(responseType);
@@ -76,6 +87,14 @@ public class ApiResponseHandler {
 			json.put("message", Constants.pageNotFound);
 			return json;
 		}
+		case UNAUTHORIZED:{
+			JSONObject json = new JSONObject();
+			json.put("status", Constants.failure);
+			json.put("code", 401);
+			json.put("message", Constants.unauthorizedUser);
+			return json;
+		}
+		
 		}
 		return null;
 
