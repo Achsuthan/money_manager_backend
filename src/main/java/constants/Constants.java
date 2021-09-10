@@ -11,6 +11,7 @@ public class Constants {
 	public static String dataMissing = "Some data missing in the body";
 	public static String serverErrorMessage = "Somethig went wrong with server please try again later";
 	public static String pageNotFound = "The page not found";
+	public static String unauthorizedUser = "Token required";
 	
 	//Success
 	public static String success = "success";
