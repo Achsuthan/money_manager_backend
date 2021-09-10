@@ -6,8 +6,10 @@ import java.security.SecureRandom;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Random;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import constants.UserConstants;
@@ -23,20 +25,27 @@ public class User extends DatabaseConnector {
 		// TODO Auto-generated constructor stub
 	}
 	
+	
 	public Pair<Integer, String> register(String email, String name, String password) {
 		try {
 			String lastId = getLastUser();
 			if(lastId != "") {
 				if(checkEmailExisit(email)) {
+					
 					remove();
 	            	return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.emailAlreadyExist));
 				}
 				else {
-					return new Pair<Integer, String>(200 ,registerUser(Helper.nextId(lastId, "USR"), email, name, password));
+					Pair<Integer, String> res = new Pair<Integer, String>(200 ,registerUser(Helper.nextId(lastId, "USR"), email, name, password));
+					remove();
+					return res;
 				}
 			}
 			else {
-				return new Pair<Integer, String>(200 ,registerUser(UserConstants.firstUserId, email, name, password));
+				
+				Pair<Integer, String> res = new Pair<Integer, String>(200 ,registerUser(UserConstants.firstUserId, email, name, password));
+				remove();
+				return res;
 			}
 			
         } catch (Exception e) {
@@ -56,9 +65,12 @@ public class User extends DatabaseConnector {
             ResultSet rs = prepStmt.executeQuery();
             
             if (rs.next()) {
+            	
             	String hasedPassword = rs.getString("password");
             	String saltDb = rs.getString("salt");
+            	
             	if (hasedPassword.equals(hashPassword(password + saltDb))) {
+            		
             		JSONObject body = new JSONObject();
             		body.put("userId", rs.getString("userId"));
             		body.put("email", rs.getString("email"));
@@ -67,25 +79,28 @@ public class User extends DatabaseConnector {
             		return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.loginSuccessfully, body));
             	}
             	else {
+            		
             		prepStmt.close();
             		remove();
             		return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.loginFailed));
             	}
             } 
             else {
+            	
             	prepStmt.close();
             	remove();
             	return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.loginFailed));
             }
            
         } catch (Exception ex) {
+        	
         	remove();
         	System.out.println(ex);
             return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
         }
     }
 	
-	private boolean checkEmailExisit(String email) {
+	public boolean checkEmailExisit(String email) {
 		
 		 try {
 			 String selectStatement = "select *  from user where email = ?;";
@@ -97,16 +112,18 @@ public class User extends DatabaseConnector {
 	         
 	         
 	         if (rs.next()) {
+	        	 
 	        	 prepStmt.close();
 	        	 return true;
 	         }
 	         else {
+	        	 
 	        	 prepStmt.close();
 	        	 return false;
 	         }
 		 }
 		 catch(Exception e) {
-			 remove();
+			 
 			 return false;
 		 }
 	}
@@ -121,7 +138,8 @@ public class User extends DatabaseConnector {
 	         ResultSet rs = prepStmt.executeQuery();
 	         
 	         if (rs.next()) {
-	        	 String userId = rs.getString("UserId");
+	        	 
+	        	 String userId = rs.getString("userId");
 	        	 prepStmt.close();
 	        	 return userId;
 	         }
@@ -130,20 +148,49 @@ public class User extends DatabaseConnector {
 	         }
 		 }
 		 catch(Exception e) {
+			 
 			 remove();
 			 return "";
 		 }
 	}
 	
+	public Boolean CheckUserExist(String UserId) {
+		
+		 try {
+			 String selectStatement = "select userId from user where userId = ?;";
+	         
+	         PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+	         prepStmt.setString(1, UserId);
+	         
+	         ResultSet rs = prepStmt.executeQuery();
+	         
+	         if (rs.next()) {
+	        	 
+	        	 prepStmt.close();
+	        	 return true;
+	         }
+	         else {
+	        	 
+	        	 prepStmt.close();
+	        	 return false;
+	         }
+		 }
+		 catch(Exception e) {
+			 
+			 return false;
+		 }
+	}
+	
 	private String registerUser(String userId, String email, String name, String password) {
 		try {
+			
 			String salt = getSalt();
 	      	String passwordHashedSalted = hashPassword(password + salt);
 	    	
 	        String sqlStatement = "insert into user(userId, email, name, salt, password, createdDate, updateDate, isDeleted) values (?, ?, ?, ? ,? ,? ,? ,?);";  
 	        
-	        long millis=System.currentTimeMillis();  
-	        java.sql.Date date = new java.sql.Date(millis);  
+	        long timeNow = Calendar.getInstance().getTimeInMillis();
+	        java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);  
 	        
 	        PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
 	        prepStmt.setString(1, userId);
@@ -151,8 +198,8 @@ public class User extends DatabaseConnector {
 	        prepStmt.setString(3, name);
 	        prepStmt.setString(4, salt);
 	        prepStmt.setString(5, passwordHashedSalted);
-	        prepStmt.setDate(6, date);
-	        prepStmt.setDate(7, date);
+	        prepStmt.setTimestamp(6, ts);
+	        prepStmt.setTimestamp(7, ts);
 	        prepStmt.setBoolean(8, false);
 	        
 	        
@@ -160,12 +207,14 @@ public class User extends DatabaseConnector {
 	        
 	        int x = prepStmt.executeUpdate();
 	        
-	        if (x == 1) {   
+	        if (x == 1) {  
+	        	
 	        	prepStmt.close();
 	            remove();
 	        	return ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.userRegisterSuccessfully);
 	        }
 	        else {
+	        	
 	        	prepStmt.close();
 	        	remove();
 	        	return ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.sqlRegisterError);
@@ -173,17 +222,59 @@ public class User extends DatabaseConnector {
 		}
 		catch(Exception e) {
 			remove();
-			return "";
+			return ApiResponseHandler.apiResponse(ResponseType.SERVERERROR);
 		}
+	}
+	
+	public Pair<Integer, String> search(String keyword) {
+		 try {
+			 
+			 System.out.println("key world" + keyword);
+			 
+			 String sqlStatement = "select userId, name, email  from user WHERE name LIKE '%" + keyword + "%' OR email LIKE '%" + keyword + "%' ;";
+	         
+			 PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
+	         
+	         ResultSet rs = prepStmt.executeQuery();
+	         
+	         System.out.println("statement" + rs);
+	         
+	         JSONObject obj = new JSONObject();
+	         
+	         JSONArray userArray = new JSONArray();
+	         while (rs.next()) {
+	        	 JSONObject user = new JSONObject();
+	        	 user.put("userId", rs.getString("userId"));
+	        	 user.put("name", rs.getString("name"));
+	        	 user.put("email", rs.getString("email"));
+	        	 userArray.put(user);
+	         }
+	         obj.put("users", userArray);
+	         System.out.println("users "+ obj.toString() );
+	         
+	         if(userArray.length() > 0 ) {
+	        	 return new Pair<Integer, String> ( 400 ,ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.usersFoundSuccessfully, obj));
+	         }
+	         else {
+	        	 return new Pair<Integer, String> ( 400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.searchKeywordNotFound));
+	         }
+		 }
+		 catch(Exception e) {
+			 System.out.println("Exception" + e);
+			 remove();
+			 return new Pair<Integer, String> ( 500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		 }
 	}
     
     private String hashAndSaltPassword(String password)
        	 throws NoSuchAlgorithmException {
+    	
        	 String salt = getSalt();
        	 return hashPassword(password + salt);
     }
     
     private static String getSalt() {
+    	
 		 Random r = new SecureRandom();
 		 byte[] saltBytes = new byte[32];
 		 r.nextBytes(saltBytes);
@@ -192,11 +283,13 @@ public class User extends DatabaseConnector {
     
     private String hashPassword(String password)
     		   throws NoSuchAlgorithmException {
+    	
     		 	MessageDigest md = MessageDigest.getInstance("SHA-256");
     		 	md.reset();
     		 	md.update(password.getBytes());
     		 	byte[] mdArray = md.digest();
     		 	StringBuilder sb = new StringBuilder(mdArray.length * 2);
+    		 	
     		 	for (byte b : mdArray) {
     		 		int v = b & 0xff;
     		 		if (v < 16) {
