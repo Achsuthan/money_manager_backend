@@ -2,6 +2,7 @@ package apiendpoint;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,6 +10,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
+
+import constants.UserConstants;
 import database.Invite;
 import database.User;
 import unitls.ApiResponseHandler;
@@ -43,16 +47,55 @@ public class Search extends HttpServlet {
 			PrintWriter out = response.getWriter();
 			if(TokenHanler.checkToken()) { 
 				
-				String keyword = request.getParameter("keyword");
-				
-				if( keyword != null) {
+				String userId = request.getParameter("userId");
+				String searchType = request.getParameter("searchType");
+
+				if (userId != null && searchType != null) {
 					
-					LogsHandler.logs();
+					String keyword = request.getParameter("keyword");
+					System.out.println("searchType"+searchType);
 					
-					User user = new User();
-					Pair<Integer, String> loginOutput = user.search(keyword);
-					response.setStatus(loginOutput.getKey());
-					out.print(loginOutput.getValue());
+					if( keyword != null) {
+						
+						LogsHandler.logs();
+						
+						//Get all the users
+						if(searchType.equals("0")) {
+							
+							database.Search search = new database.Search();
+							Pair<Integer, String> searchResult = search.searchAllUsers(keyword, userId);
+							response.setStatus(HttpServletResponse.SC_OK);
+							out.print(searchResult.getValue());
+						}
+						//Only friends
+						else if(searchType.equals("1")){
+							
+							database.Search search = new database.Search();
+							Pair<Integer, String> searchResult = search.searchFriends(keyword, userId);
+							response.setStatus(HttpServletResponse.SC_OK);
+							out.print(searchResult.getValue());
+						}
+						else if(searchType.equals("2")) {
+							
+							database.Search search = new database.Search();
+							Pair<Integer, String> searchResult = search.searchUserByAllAndFriends(keyword, userId);
+							response.setStatus(HttpServletResponse.SC_OK);
+							out.print(searchResult.getValue());
+						}
+						else {
+							response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+							out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+						}
+					}
+					else {
+						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+					}
+				}
+				else {
+
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
 			}
 			else {

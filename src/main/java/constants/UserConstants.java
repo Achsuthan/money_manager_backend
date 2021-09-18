@@ -18,5 +18,7 @@ public class UserConstants {
 	public static String emailAlreadyExist = "This email address is already exist please try again with new email";
 	public static String loginFailed = "Please check your email address and password";
 	public static String searchKeywordNotFound = "Search keyword users are not found";
+	public static String userNotFound = "User not found in the system";
+	public static String requestedUserNotFound = "Requesting friend is not found";
 	
 }

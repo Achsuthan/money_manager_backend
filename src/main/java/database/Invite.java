@@ -29,55 +29,10 @@ public class Invite extends DatabaseConnector {
 				System.out.println("user exist");
 				
 				if (user.checkEmailExisit(email)) {
-					
-					System.out.println("email exist");
-					
-					
-					Pair<Integer, String> emailStatus = checkEmailExist(email);
-					
-					switch (emailStatus.getKey()) {
-					case 200: {
-						
-						remove();
-						JSONObject obj = new JSONObject();
-						obj.put("link", emailStatus.getValue());
-			            return new Pair<Integer, String>(200 ,ApiResponseHandler.apiResponse(ResponseType.SUCCESS,  InviteConstants.inviteCreatedSuccessfully ,obj));
-					}
-					case 500: {
-						
-						remove();
-						return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
-					}
-					case 400: {
-						
-						String lastId = getLastInvite();
-						
-						System.out.println("last id " + lastId);
-						
-						if(lastId != "") {
-							
-							System.out.println("last id available");
-							
-							Pair<Integer, String> res = addInvite(Helper.nextId(lastId, "INV"), userId ,email);
-							remove();
-							return res;
-						}
-						else {
-							
-							System.out.println("last id not available");
-							Pair<Integer, String> res = addInvite(InviteConstants.firstInviteId, userId ,email) ;
-							remove();
-							return res;
-						}
-					}
-					default:
-						return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.EmailAlreadyExist));
-					}
+					return handleCreateInviteLink(email, userId);
 				}
 				else {
-					
-					remove();
-		            return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userAlreadyExist));
+					return handleCreateInviteLink(email, userId);
 				}
 			}
 			else {
@@ -88,6 +43,60 @@ public class Invite extends DatabaseConnector {
 		}
 		catch(Exception e) {
 			
+			remove();
+            return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+	
+	private Pair<Integer, String> handleCreateInviteLink(String email, String userId){
+		
+		try {
+			System.out.println("email exist");
+			
+			
+			Pair<Integer, String> emailStatus = checkEmailExist(email);
+			System.out.println("status "+ emailStatus.getKey());
+			
+			switch (emailStatus.getKey()) {
+			case 200: {
+				
+				remove();
+				JSONObject obj = new JSONObject();
+				obj.put("link", emailStatus.getValue());
+	            return new Pair<Integer, String>(200 ,ApiResponseHandler.apiResponse(ResponseType.SUCCESS,  InviteConstants.inviteCreatedSuccessfully ,obj));
+			}
+			case 500: {
+				
+				remove();
+				return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+			}
+			case 400: {
+				
+				String lastId = getLastInvite();
+				
+				System.out.println("last id " + lastId);
+				
+				if(lastId != "") {
+					
+					System.out.println("last id available");
+					
+					Pair<Integer, String> res = addInvite(Helper.nextId(lastId, "INV"), userId ,email);
+					remove();
+					return res;
+				}
+				else {
+					
+					System.out.println("last id not available");
+					Pair<Integer, String> res = addInvite(InviteConstants.firstInviteId, userId ,email) ;
+					remove();
+					return res;
+				}
+			}
+			default:
+				return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.EmailAlreadyExist));
+			}
+		}
+		catch (Exception e) {
 			remove();
             return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
