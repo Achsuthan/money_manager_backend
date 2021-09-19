@@ -1,0 +1,302 @@
+package database;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Calendar;
+
+import org.json.JSONObject;
+
+import constants.InviteConstants;
+import unitls.ApiResponseHandler;
+import unitls.Helper;
+import unitls.Pair;
+import unitls.ResponseType;
+
+public class GroupInvite extends DatabaseConnector {
+
+	public GroupInvite() throws Exception {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	public Pair<Integer, String> createGroupInvite(String userId, Integer accessLevel, String email, String groupId) {
+		try {
+			User user = new User();
+
+			if (user.CheckUserExist(userId)) {
+				
+				Group group = new Group();
+				
+				if(group.checkGroupExist(groupId)) {
+					System.out.println("user exist");
+
+					if (user.checkEmailExisit(email)) {
+						return handleCreateInviteLink(email, userId, accessLevel, groupId);
+					} else {
+						return handleCreateInviteLink(email, userId, accessLevel, groupId);
+					}
+				}
+				else {
+					remove();
+					return new Pair<Integer, String>(400,
+							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.groupNotExist));
+				}
+
+				
+			} else {
+
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userNotExist));
+			}
+		} catch (Exception e) {
+
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+
+	private Pair<Integer, String> handleCreateInviteLink(String email, String userId, Integer accessLevel, String groupId) {
+
+		try {
+			System.out.println("email exist");
+
+			Pair<Integer, String> emailStatus = checkEmailExist(email);
+			System.out.println("status " + emailStatus.getKey());
+
+			switch (emailStatus.getKey()) {
+			case 200: {
+
+				remove();
+				JSONObject obj = new JSONObject();
+				obj.put("link", emailStatus.getValue());
+				return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
+						InviteConstants.inviteCreatedSuccessfully, obj));
+			}
+			case 500: {
+
+				remove();
+				return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+			}
+			case 400: {
+
+				String lastId = getLastGroupInviteId();
+
+				System.out.println("last id " + lastId);
+
+				if (!lastId.isEmpty()) {
+
+					System.out.println("last id available");
+
+					Pair<Integer, String> res = addInvite(Helper.nextId(lastId, "GIV"), userId, email, accessLevel, groupId);
+					remove();
+					return res;
+				} else {
+
+					System.out.println("last id not available");
+					Pair<Integer, String> res = addInvite(InviteConstants.firstGroupInviteId, userId, email, accessLevel, groupId);
+					remove();
+					return res;
+				}
+			}
+			default:
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.EmailAlreadyExist));
+			}
+		} catch (Exception e) {
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+
+	private Pair<Integer, String> addInvite(String inviteId, String userId, String email, Integer accessLevel, String groupId) {
+
+		try {
+
+			String sqlStatement = "insert into group_invite (groupInviteId, email, expiryTime, isDeleted, createdDate, updatedDate, userId, accessLevel, inviteGroupId) values (?, ?, ?, ? ,? ,? ,?, ?, ?);";
+
+			Calendar cal = Calendar.getInstance();
+			long timeNow = cal.getTimeInMillis();
+			java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
+
+			cal.add(Calendar.DAY_OF_MONTH, InviteConstants.linkExpiryDays);
+			long expiryTime = cal.getTimeInMillis();
+			java.sql.Timestamp expiryts = new java.sql.Timestamp(expiryTime);
+
+			PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
+			prepStmt.setString(1, inviteId);
+			prepStmt.setString(2, email);
+			prepStmt.setTimestamp(3, expiryts);
+			prepStmt.setBoolean(4, false);
+			prepStmt.setTimestamp(5, ts);
+			prepStmt.setTimestamp(6, ts);
+			prepStmt.setString(7, userId);
+			prepStmt.setInt(8, accessLevel);
+			prepStmt.setString(9, groupId);
+
+			System.out.println("Testing 3"+ inviteId);
+
+			int x = prepStmt.executeUpdate();
+			
+			System.out.println("excute "+ x);
+
+			if (x == 1) {
+				System.out.println("create success");
+				// Send email
+				prepStmt.close();
+				ResultSet singleInvite = getSingleInvite(inviteId);
+
+				if (singleInvite.next()) {
+
+					JSONObject obj = new JSONObject();
+					obj.put("Link", singleInvite.getString("groupInviteId"));
+					remove();
+					return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
+							InviteConstants.inviteCreatedSuccessfully, obj));
+
+				} else {
+					remove();
+					return new Pair<Integer, String>(400,
+							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.inviteCreateFailed));
+				}
+			} else {
+
+				prepStmt.close();
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.inviteCreateFailed));
+			}
+		} catch (Exception e) {
+
+			System.out.println("addInvite addInvite" + e);
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+
+	private Pair<Integer, String> checkEmailExist(String email) throws Exception {
+
+		String selectStatement = "select * from group_invite where email = ?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, email);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			Calendar cal = Calendar.getInstance();
+			long timeNow = cal.getTimeInMillis();
+			java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
+
+			java.sql.Timestamp expiryTs = rs.getTimestamp("expiryTime");
+
+			String linkId = rs.getString("groupInviteId");
+
+			if (expiryTs.compareTo(ts) > 0) {
+
+				System.out.println("Still have expiry time");
+				prepStmt.close();
+				// need to send the link
+				return new Pair<Integer, String>(200, linkId);
+			} else {
+				System.out.println("expired");
+				prepStmt.close();
+				if (updateExpiryDate(linkId)) {
+
+					// Need to send the link
+					return new Pair<Integer, String>(200, linkId);
+				} else {
+					return new Pair<Integer, String>(500, "");
+				}
+
+			}
+
+		} else {
+
+			prepStmt.close();
+			return new Pair<Integer, String>(400, "");
+		}
+
+	}
+
+	private Boolean updateExpiryDate(String inviteId) throws Exception {
+		String sqlStatement = "update group_invite set expiryTime = ?, updatedDate = ? where groupInviteId = ?;";
+
+		Calendar cal = Calendar.getInstance();
+		long timeNow = cal.getTimeInMillis();
+		java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
+
+		cal.add(Calendar.DAY_OF_MONTH, InviteConstants.linkExpiryDays);
+		long expiryTime = cal.getTimeInMillis();
+		java.sql.Timestamp expiryts = new java.sql.Timestamp(expiryTime);
+
+		PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
+		prepStmt.setTimestamp(1, expiryts);
+		prepStmt.setTimestamp(2, ts);
+		prepStmt.setString(3, inviteId);
+
+		int x = prepStmt.executeUpdate();
+
+		if (x == 1) {
+
+			// Send email
+			prepStmt.close();
+			remove();
+			return true;
+		} else {
+
+			prepStmt.close();
+			remove();
+			return false;
+		}
+	}
+
+	private String getLastGroupInviteId() throws Exception {
+		String selectStatement = "select groupInviteId from group_invite ORDER BY groupInviteId DESC LIMIT 1;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			String groupInviteId = rs.getString("groupInviteId");
+			prepStmt.close();
+			return groupInviteId;
+		} else {
+			return "";
+		}
+	}
+
+	private Boolean checkGroupInviteExist(String groupInviteId) throws Exception {
+		String selectStatement = "select *  from group_invite where groupInviteId = ?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, groupInviteId);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			prepStmt.close();
+			return true;
+		} else {
+
+			prepStmt.close();
+			return false;
+		}
+	}
+
+	private ResultSet getSingleInvite(String inviteId) throws Exception {
+
+		String selectStatement = "select * from group_invite where groupInviteId = ?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, inviteId);
+
+		ResultSet rs = prepStmt.executeQuery();
+		return rs;
+	}
+
+}

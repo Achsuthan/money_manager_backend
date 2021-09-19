@@ -94,6 +94,22 @@ public class Group extends DatabaseConnector {
 		}
 	}
 	
+	
+	public Boolean checkGroupExist(String groupId) throws Exception{
+
+		String selectStatement = "select * from spending_group where groupId = ?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, groupId);
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	private Boolean addGroupInfo(String groupId, String groupName) throws Exception {
 	
 		String sqlStatement = "insert into spending_group(groupId, name, createdDate, updatedDate, isDeleted) values (?, ?, ? ,? ,?);";

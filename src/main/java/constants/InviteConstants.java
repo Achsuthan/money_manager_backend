@@ -5,6 +5,7 @@ public class InviteConstants {
 	//Common 
 	public static String firstInviteId = "INV-11111111";
 	public static Integer linkExpiryDays = 90;
+	public static String firstGroupInviteId = "GIV-11111111";
 		
 	//Success 
 	public static String inviteCreatedSuccessfully = "Invite created successfully";
@@ -19,6 +20,7 @@ public class InviteConstants {
 	public static String fieldsMissing = "Please check all the values";
 	public static String iviteNotExist = "Invite is not exist";
 	public static String acceptInviteFailed = "Accept Friend request is failed but you have successfully registered to the system";
+	public static String groupNotExist = "Group is not exist";
 	
 
 }
