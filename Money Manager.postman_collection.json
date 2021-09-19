@@ -1,0 +1,409 @@
+{
+	"info": {
+		"_postman_id": "1bc95db4-a62b-4595-a9d9-3127135e1ad5",
+		"name": "Money Manager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login/SignUp",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "1@1.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "121",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "100@1.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "121",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "achsuthan",
+									"type": "text"
+								},
+								{
+									"key": "inviteId",
+									"value": "INV-11111111",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "FriendsInvite",
+			"item": [
+				{
+					"name": "Create Invite",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "userId",
+									"value": "USR-11111111",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "101@1.com",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friend-invite",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friend-invite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DeleteInvite",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friend-invite?userId=USR-11111111&inviteId=INV-11111112",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friend-invite"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111111"
+								},
+								{
+									"key": "inviteId",
+									"value": "INV-11111112"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Friends",
+			"item": [
+				{
+					"name": "FriendRequest",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "userId",
+									"value": "USR-11111114",
+									"type": "text"
+								},
+								{
+									"key": "friendId",
+									"value": "USR-11111111",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friend-request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friend-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "AcceptRequst",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "friendsRequestId",
+									"value": "FRI-11111112",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/accept-request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"accept-request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all request",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "userId",
+									"value": "USR-11111111",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friend-request?userId=USR-11111111",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friend-request"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111111"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "UserSearch",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "keyword",
+									"value": "an",
+									"type": "text"
+								},
+								{
+									"key": "userId",
+									"value": "USR-11111111",
+									"type": "text"
+								},
+								{
+									"key": "searchType",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"search"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Group Invitation",
+			"item": [
+				{
+					"name": "Create Invitation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "101@1.com",
+									"type": "text"
+								},
+								{
+									"key": "userId",
+									"value": "USR-11111111",
+									"type": "text"
+								},
+								{
+									"key": "accessLevel",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "groupId",
+									"value": "GRP-11111116",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group-invite",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group-invite"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Group",
+			"item": [
+				{
+					"name": "Create Group",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "userId",
+									"value": "USR-11111112",
+									"type": "text"
+								},
+								{
+									"key": "groupName",
+									"value": "Testing",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/create-group",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"create-group"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/Money_Manager_Backend"
+		}
+	]
+}
