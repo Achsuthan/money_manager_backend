@@ -164,7 +164,7 @@ public class Group extends DatabaseConnector {
 			if (x == 1) {
 				prepStmt.close();
 				remove();
-	            return new Pair<Integer, String>(200 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.success));
+	            return new Pair<Integer, String>(200 ,ApiResponseHandler.apiResponse(ResponseType.SUCCESS, GroupConstraints.success));
 			} else {
 				prepStmt.close();
 				remove();

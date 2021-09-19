@@ -102,6 +102,59 @@ public class FriendInvite extends DatabaseConnector {
 		}
 	}
 	
+	public Pair<Integer, String> deleteInvite(String inviteId, String userId) {
+		
+		try {
+			
+			User user = new User();
+			if(user.CheckUserExist(userId)) {
+				
+				if(checkInviteIdExist(inviteId)) {
+					
+					String selectStatement = "delete from invite where inviteId=?;";
+			         
+			         PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+			         prepStmt.setString(1, inviteId);
+			         
+			         prepStmt.executeUpdate();
+			         
+			         return new Pair<Integer, String>(200 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.inviteDeletedSuccessfully));
+				}
+				else {
+					remove();
+		            return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.iviteNotExist));
+				}
+			}
+			else {
+				remove();
+	            return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userNotExist));
+			}
+			 
+		 }
+		 catch(Exception e) {
+			 
+			 System.out.println("Yoo yooo"+ e);
+			 return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		 }
+	}
+	
+	private Boolean checkInviteIdExist(String inviteId) throws Exception{
+
+		String selectStatement = "select * from invite where inviteId = ?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, inviteId);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	private Pair<Integer, String> checkEmailExist(String email) {
 		
 		try {

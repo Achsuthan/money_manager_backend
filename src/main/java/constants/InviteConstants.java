@@ -8,6 +8,7 @@ public class InviteConstants {
 		
 	//Success 
 	public static String inviteCreatedSuccessfully = "Invite created successfully";
+	public static String inviteDeletedSuccessfully = "Invite deleted succssfully";
 	
 	//Failure
 	public static String userNotExist = "The user is not exist in the system";
@@ -16,6 +17,7 @@ public class InviteConstants {
 	public static String userAlreadyExist = "This user is alredy exist in the sytem";
 	public static String emailFormatRequired = "Please enter valid email format";
 	public static String fieldsMissing = "Please check all the values";
+	public static String iviteNotExist = "Invite is not exist";
 	
 
 }
