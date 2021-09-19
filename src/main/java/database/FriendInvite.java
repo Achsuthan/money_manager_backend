@@ -4,9 +4,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Calendar;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.json.JSONObject;
 
 import constants.InviteConstants;
+import constants.UserConstants;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
 import unitls.Pair;
@@ -76,7 +79,7 @@ public class FriendInvite extends DatabaseConnector {
 				
 				System.out.println("last id " + lastId);
 				
-				if(lastId != "") {
+				if(!lastId.isEmpty()) {
 					
 					System.out.println("last id available");
 					
@@ -138,7 +141,63 @@ public class FriendInvite extends DatabaseConnector {
 		 }
 	}
 	
-	private Boolean checkInviteIdExist(String inviteId) throws Exception{
+	public Pair<Integer, String> acceptInvite(String email, String name, String password, String inviteId) {
+		
+		try {
+			
+			User user = new User();
+			Pair<Integer, String> registerOutput = user.register(email, name, password, false);
+			if(registerOutput.getKey() == 200) {
+				ResultSet singleInvite = getSingleInvite(inviteId);
+				
+				if (singleInvite.next()) {
+		        	 
+		        	 String userId = singleInvite.getString("userId");
+		        	 
+		        	 ResultSet singleUserDetails = user.getSingleUserDetailsByEmail(email);
+		        	 if(singleUserDetails.next()) {
+		        		 String friendId = singleUserDetails.getString("userId");
+		        		 FriendRequest friend = new FriendRequest();
+		        		 Pair<Integer, String> friedResult= friend.createFriends(userId, friendId);
+		        		 if(friedResult.getKey() == 200) {
+		        			 FriendInvite invite = new FriendInvite();
+		        			 Pair<Integer, String> inviteResult = invite.deleteInvite(inviteId, friendId);
+		        			 if(inviteResult.getKey() == 200 ) {
+		        				 return new Pair<Integer, String>(200,
+		        							ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.userRegisterSuccessfully));
+		        			 }
+		        			 else {
+		        				 return new Pair<Integer, String>(400 , ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.acceptInviteFailed));
+		        			 }
+		        		 }
+		        		 else {
+		        			 remove();
+		        			 return friedResult;
+		        		 }
+		        	 }
+		        	 else {
+		        		 remove();
+			        	 return new Pair<Integer, String>(400 , ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.acceptInviteFailed));
+		        	 }
+		         }
+		         else {
+		        	 remove();
+		        	 return new Pair<Integer, String>(400 , ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.acceptInviteFailed));
+		         }
+			}
+			else {
+				return registerOutput;
+			}
+			 
+		 }
+		 catch(Exception e) {
+			 
+			 System.out.println("Yoo yooo"+ e);
+			 return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		 }
+	}
+	
+	public Boolean checkInviteIdExist(String inviteId) throws Exception{
 
 		String selectStatement = "select * from invite where inviteId = ?;";
 
@@ -244,9 +303,20 @@ public class FriendInvite extends DatabaseConnector {
 	        	
 	        	//Send email
 	        	prepStmt.close();
-	            Pair<Integer, String> res = getSingleInvite(inviteId);
-	            remove();
-	        	return res;
+	        	ResultSet singleInvite = getSingleInvite(inviteId);
+	        	
+	        	if (singleInvite.next()) {
+		        	 
+		        	 JSONObject obj = new JSONObject();
+		        	 obj.put("Link", singleInvite.getString("inviteId"));
+		        	 remove();
+		        	 return new Pair<Integer, String>(200 , ApiResponseHandler.apiResponse(ResponseType.SUCCESS, InviteConstants.inviteCreatedSuccessfully, obj));
+		        	 
+		         }
+		         else {
+		        	 remove();
+		        	 return new Pair<Integer, String>(400 , ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.inviteCreateFailed));
+		         }
 	        }
 	        else {
 	        	
@@ -281,34 +351,15 @@ public class FriendInvite extends DatabaseConnector {
 
 	}
 
-	private Pair<Integer, String> getSingleInvite(String inviteId) {
-		try {
+	private ResultSet getSingleInvite(String inviteId) throws Exception {
+	
 			 String selectStatement = "select * from invite where inviteId = ?;";
 	         
 	         PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 	         prepStmt.setString(1, inviteId);
 	         
 	         ResultSet rs = prepStmt.executeQuery();
-	         
-	         if (rs.next()) {
-	        	 
-	        	 JSONObject obj = new JSONObject();
-	        	 obj.put("Link", rs.getString("inviteId"));
-	        	 prepStmt.close();
-	        	 return new Pair<Integer, String>(200 , ApiResponseHandler.apiResponse(ResponseType.SUCCESS, InviteConstants.inviteCreatedSuccessfully, obj));
-	        	 
-	         }
-	         else {
-	        	 
-	        	 prepStmt.close();
-	        	 return new Pair<Integer, String>(200 , ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.inviteCreateFailed));
-	         }
-		 }
-		 catch(Exception e) {
-			 
-			 System.out.println("Yoo yooo"+ e);
-			 return new Pair<Integer, String>(500 , ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
-		 }
+	         return rs;
 	}
 	
 	private Boolean updateExpiryDate(String inviteId) {

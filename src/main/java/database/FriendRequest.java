@@ -37,7 +37,7 @@ public class FriendRequest extends DatabaseConnector {
 
 					if (!isAlreadyRequested(userId, friendId)) {
 						String friendsId = getLastFriendRequest();
-						if (friendsId != "") {
+						if (!friendsId.isEmpty()) {
 							return createRequest(Helper.nextId(friendsId, "FRI"), userId, friendId);
 
 						} else {
@@ -317,6 +317,60 @@ public class FriendRequest extends DatabaseConnector {
 				remove();
 				return new Pair<Integer, String>(400,
 						ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.sqlRegisterError));
+			}
+
+		} catch (Exception e) {
+
+			System.out.println(" friend request request" + e);
+			remove();
+			return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+	
+	
+	public Pair<Integer, String> createFriends(String userId, String friendId) {
+		try {
+			
+			String friendsId = getLastFriendRequest();
+			if (!friendsId.isEmpty()) {
+				friendsId = Helper.nextId(friendsId, "FRI");
+
+			}
+			else {
+				friendsId = FriendRequestConstraints.firstRequestId;
+			}
+
+			String sqlStatement = "insert into friends(friendsId, requestedDate, isDeleted, createdDate, updateDate, senderUserId, receiverUserId, isFriends) values (?, ?, ?, ? ,? ,? ,?, ?);";
+
+			long timeNow = Calendar.getInstance().getTimeInMillis();
+			java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
+
+			PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
+			prepStmt.setString(1, friendsId);
+			prepStmt.setTimestamp(2, ts);
+			prepStmt.setBoolean(3, false);
+			prepStmt.setTimestamp(4, ts);
+			prepStmt.setTimestamp(5, ts);
+			prepStmt.setString(6, userId);
+			prepStmt.setString(7, friendId);
+			prepStmt.setBoolean(8, true);
+
+			System.out.println("Testing 3");
+
+			int x = prepStmt.executeUpdate();
+
+			if (x == 1) {
+
+				prepStmt.close();
+				remove();
+				return new Pair<Integer, String>(200,
+						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, FriendRequestConstraints.friendsCreatedSuccessfully));
+			} else {
+
+				prepStmt.close();
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, FriendRequestConstraints.friendsCreationFailed));
 			}
 
 		} catch (Exception e) {

@@ -9,7 +9,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import constants.InviteConstants;
 import constants.UserConstants;
+import database.FriendInvite;
 import database.User;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
@@ -45,18 +47,33 @@ public class Register extends HttpServlet {
 			String email = request.getParameter("email");
 			String password = request.getParameter("password");
 			String name = request.getParameter("name");
+			String inviteId = request.getParameter("inviteId");
 			
 			if(email != null && password != null && name != null) {
 				
 				if(Helper.isEmailValid(email)) {
 					
 					LogsHandler.logs();
-					
-					User user = new User();
-					response.setStatus(HttpServletResponse.SC_OK);
-					Pair<Integer, String> registerOutput = user.register(email, name, password);
-					response.setStatus(registerOutput.getKey());
-					out.print(registerOutput.getValue());
+					FriendInvite invite = new FriendInvite();
+					if(inviteId != null) {
+						
+						if(!invite.checkInviteIdExist(inviteId)) {
+							response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+							out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.iviteNotExist));
+						}
+						else {
+							Pair<Integer, String> acceptOutput = invite.acceptInvite(email, name, password, inviteId);
+							response.setStatus(acceptOutput.getKey());
+							out.print(acceptOutput.getValue());
+						}
+					}
+					else {
+						User user = new User();
+						response.setStatus(HttpServletResponse.SC_OK);
+						Pair<Integer, String> registerOutput = user.register(email, name, password, true);
+						response.setStatus(registerOutput.getKey());
+						out.print(registerOutput.getValue());
+					}
 				}
 				else {
 					

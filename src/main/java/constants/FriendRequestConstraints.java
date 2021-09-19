@@ -8,6 +8,7 @@ public class FriendRequestConstraints {
 	//Success
 	public static String acceptedSuccessfully = "Friend request accepted successfully";
 	public static String getFriendsSuccess = "Get all friend request successfully";
+	public static String friendsCreatedSuccessfully = "Request Created successfully";
 
 	
 	//failure
@@ -15,4 +16,5 @@ public class FriendRequestConstraints {
 	public static String sameUserRequest = "You can't send request to you";
 	public static String requestNotExisit = "Friend request is not exisists";
 	public static String alreayFriends = "You are already friends with the requested person";
+	public static String friendsCreationFailed = "Something went wrond when create friends please try again later";
 }

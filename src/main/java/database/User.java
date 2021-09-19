@@ -28,10 +28,10 @@ public class User extends DatabaseConnector {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Pair<Integer, String> register(String email, String name, String password) {
+	public Pair<Integer, String> register(String email, String name, String password, Boolean isCloseConection) {
 		try {
 			String lastId = getLastUser();
-			if (lastId != "") {
+			if (!lastId.isEmpty()) {
 				if (checkEmailExisit(email)) {
 
 					remove();
@@ -40,7 +40,9 @@ public class User extends DatabaseConnector {
 				} else {
 
 					Pair<Integer, String> res = registerUser(Helper.nextId(lastId, "USR"), email, name, password);
-					remove();
+					if(isCloseConection) {
+						remove();
+					}
 					return res;
 				}
 			} else {
@@ -183,51 +185,53 @@ public class User extends DatabaseConnector {
 		}
 		return obj;
 	}
+	
+	public ResultSet getSingleUserDetailsByEmail(String email) throws Exception {
+		String selectStatement = "select * from user where email = ?;";
 
-	private Pair<Integer, String> registerUser(String userId, String email, String name, String password) {
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, email);
 
-		try {
+		ResultSet rs = prepStmt.executeQuery();
+		return rs;
+	}
 
-			String salt = getSalt();
-			String passwordHashedSalted = hashPassword(password + salt);
+	private Pair<Integer, String> registerUser(String userId, String email, String name, String password) throws Exception {
 
-			String sqlStatement = "insert into user(userId, email, name, salt, password, createdDate, updateDate, isDeleted) values (?, ?, ?, ? ,? ,? ,? ,?);";
+		String salt = getSalt();
+		String passwordHashedSalted = hashPassword(password + salt);
 
-			long timeNow = Calendar.getInstance().getTimeInMillis();
-			java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
+		String sqlStatement = "insert into user(userId, email, name, salt, password, createdDate, updateDate, isDeleted) values (?, ?, ?, ? ,? ,? ,? ,?);";
 
-			PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
-			prepStmt.setString(1, userId);
-			prepStmt.setString(2, email);
-			prepStmt.setString(3, name);
-			prepStmt.setString(4, salt);
-			prepStmt.setString(5, passwordHashedSalted);
-			prepStmt.setTimestamp(6, ts);
-			prepStmt.setTimestamp(7, ts);
-			prepStmt.setBoolean(8, false);
+		long timeNow = Calendar.getInstance().getTimeInMillis();
+		java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
 
-			System.out.println("Testing 3");
+		PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
+		prepStmt.setString(1, userId);
+		prepStmt.setString(2, email);
+		prepStmt.setString(3, name);
+		prepStmt.setString(4, salt);
+		prepStmt.setString(5, passwordHashedSalted);
+		prepStmt.setTimestamp(6, ts);
+		prepStmt.setTimestamp(7, ts);
+		prepStmt.setBoolean(8, false);
 
-			int x = prepStmt.executeUpdate();
+		System.out.println("Testing 3");
 
-			if (x == 1) {
+		int x = prepStmt.executeUpdate();
 
-				prepStmt.close();
-				remove();
-				return new Pair<Integer, String>(200,
-						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.userRegisterSuccessfully));
-			} else {
+		if (x == 1) {
 
-				prepStmt.close();
-				remove();
-				return new Pair<Integer, String>(400,
-						ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.sqlRegisterError));
-			}
-		} catch (Exception e) {
+			prepStmt.close();
+			return new Pair<Integer, String>(200,
+					ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.userRegisterSuccessfully));
+		} else {
 
-			remove();
-			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+			prepStmt.close();
+			return new Pair<Integer, String>(400,
+					ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.sqlRegisterError));
 		}
+
 	}
 
 	private String hashAndSaltPassword(String password) throws NoSuchAlgorithmException {

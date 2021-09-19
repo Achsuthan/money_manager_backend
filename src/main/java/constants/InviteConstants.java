@@ -18,6 +18,7 @@ public class InviteConstants {
 	public static String emailFormatRequired = "Please enter valid email format";
 	public static String fieldsMissing = "Please check all the values";
 	public static String iviteNotExist = "Invite is not exist";
+	public static String acceptInviteFailed = "Accept Friend request is failed but you have successfully registered to the system";
 	
 
 }
