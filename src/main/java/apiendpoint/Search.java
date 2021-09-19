@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 import constants.UserConstants;
-import database.FriendsInvite;
+import database.FriendInvite;
 import database.User;
 import unitls.ApiResponseHandler;
 import unitls.LogsHandler;

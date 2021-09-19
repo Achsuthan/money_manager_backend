@@ -12,9 +12,9 @@ import unitls.Helper;
 import unitls.Pair;
 import unitls.ResponseType;
 
-public class FriendsInvite extends DatabaseConnector {
+public class FriendInvite extends DatabaseConnector {
 
-	public FriendsInvite() throws Exception {
+	public FriendInvite() throws Exception {
 		super();
 		// TODO Auto-generated constructor stub
 	}
