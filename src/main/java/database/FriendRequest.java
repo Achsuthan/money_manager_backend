@@ -129,7 +129,7 @@ public class FriendRequest extends DatabaseConnector {
 
 	private JSONArray getFriends(String userId) throws Exception {
 		
-		String selectStatement = "select * from friends where (senderUserId = ? OR recevierUserId = ?) AND isFriends = ?;";
+		String selectStatement = "select * from friends where (senderUserId = ? OR receiverUserId = ?) AND isFriends = ?;";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 		prepStmt.setString(1, userId);
@@ -143,7 +143,7 @@ public class FriendRequest extends DatabaseConnector {
 			
 			User user = new User();
 			String senderId = rs.getString("senderUserId");
-			String receiverId = rs.getString("recevierUserId");
+			String receiverId = rs.getString("receiverUserId");
 			arr.put(user.getSingleUserDetails(userId.equals(senderId) ? receiverId : senderId));
 		}
 		prepStmt.close();
@@ -164,7 +164,7 @@ public class FriendRequest extends DatabaseConnector {
 		JSONArray arr = new JSONArray();
 		while (rs.next()) {
 			User user = new User();
-			arr.put(user.getSingleUserDetails(rs.getString("recevierUserId")));
+			arr.put(user.getSingleUserDetails(rs.getString("receiverUserId")));
 		}
 		prepStmt.close();
 		return arr;
@@ -172,7 +172,7 @@ public class FriendRequest extends DatabaseConnector {
 
 	private JSONArray receiverRequest(String userId) throws Exception {
 
-		String selectStatement = "select * from friends where recevierUserId = ? AND isFriends = ?;";
+		String selectStatement = "select * from friends where receiverUserId = ? AND isFriends = ?;";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 		prepStmt.setString(1, userId);
@@ -240,7 +240,7 @@ public class FriendRequest extends DatabaseConnector {
 
 	private Boolean isAlreadyRequested(String userId, String friendId) throws Exception {
 
-		String selectStatement = "select * from friends where (senderUserId = ? AND recevierUserId = ?) OR (senderUserId = ? AND recevierUserId = ?);";
+		String selectStatement = "select * from friends where (senderUserId = ? AND receiverUserId = ?) OR (senderUserId = ? AND receiverUserId = ?);";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 		prepStmt.setString(1, userId);
@@ -286,7 +286,7 @@ public class FriendRequest extends DatabaseConnector {
 	private Pair<Integer, String> createRequest(String friendsId, String userId, String friendId) {
 		try {
 
-			String sqlStatement = "insert into friends(friendsId, requestedDate, isDeleted, createdDate, updateDate, senderUserId, recevierUserId, isFriends) values (?, ?, ?, ? ,? ,? ,?, ?);";
+			String sqlStatement = "insert into friends(friendsId, requestedDate, isDeleted, createdDate, updateDate, senderUserId, receiverUserId, isFriends) values (?, ?, ?, ? ,? ,? ,?, ?);";
 
 			long timeNow = Calendar.getInstance().getTimeInMillis();
 			java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
