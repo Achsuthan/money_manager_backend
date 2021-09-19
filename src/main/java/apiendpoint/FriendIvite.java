@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import constants.InviteConstants;
 import constants.UserConstants;
-import database.Invite;
+import database.FriendsInvite;
 import database.User;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
@@ -66,7 +66,7 @@ public class FriendIvite extends HttpServlet {
 							
 							LogsHandler.logs();
 							
-							Invite invite = new Invite();
+							FriendsInvite invite = new FriendsInvite();
 							Pair<Integer, String> loginOutput = invite.createInvite(email, userId);
 							response.setStatus(loginOutput.getKey());
 							out.print(loginOutput.getValue());

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 import constants.UserConstants;
-import database.Invite;
+import database.FriendsInvite;
 import database.User;
 import unitls.ApiResponseHandler;
 import unitls.LogsHandler;
@@ -64,7 +64,7 @@ public class Search extends HttpServlet {
 							
 							database.Search search = new database.Search();
 							Pair<Integer, String> searchResult = search.searchAllUsers(keyword, userId);
-							response.setStatus(HttpServletResponse.SC_OK);
+							response.setStatus(searchResult.getKey());
 							out.print(searchResult.getValue());
 						}
 						//Only friends
@@ -72,14 +72,14 @@ public class Search extends HttpServlet {
 							
 							database.Search search = new database.Search();
 							Pair<Integer, String> searchResult = search.searchFriends(keyword, userId);
-							response.setStatus(HttpServletResponse.SC_OK);
+							response.setStatus(searchResult.getKey());
 							out.print(searchResult.getValue());
 						}
 						else if(searchType.equals("2")) {
 							
 							database.Search search = new database.Search();
 							Pair<Integer, String> searchResult = search.searchUserByAllAndFriends(keyword, userId);
-							response.setStatus(HttpServletResponse.SC_OK);
+							response.setStatus(searchResult.getKey());
 							out.print(searchResult.getValue());
 						}
 						else {

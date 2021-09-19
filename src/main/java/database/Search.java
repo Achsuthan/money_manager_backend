@@ -26,7 +26,7 @@ public class Search extends DatabaseConnector {
 					from user 
 					WHERE (
 						userId in (
-							select recevierUserId 
+							select receiverUserId 
 							from friends 
 							where (senderUserId = ? AND isFriends = true)
 						) 
@@ -35,7 +35,7 @@ public class Search extends DatabaseConnector {
 						userId in (
 							select senderUserId 
 							from friends 
-							where recevierUserId = ? AND isFriends = true)
+							where receiverUserId = ? AND isFriends = true)
 						)
 					)
 					AND 
@@ -122,7 +122,7 @@ public class Search extends DatabaseConnector {
 					from user 
 					WHERE (
 						userId not in (
-							select recevierUserId 
+							select receiverUserId 
 							from friends 
 							where (senderUserId = ? AND isFriends = true)
 						) 
@@ -131,7 +131,7 @@ public class Search extends DatabaseConnector {
 						userId not in (
 							select senderUserId 
 							from friends 
-							where recevierUserId = ? AND isFriends = true)
+							where receiverUserId = ? AND isFriends = true)
 						)
 					)
 					AND 

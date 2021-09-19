@@ -12,9 +12,9 @@ import unitls.Helper;
 import unitls.Pair;
 import unitls.ResponseType;
 
-public class Invite extends DatabaseConnector {
+public class FriendsInvite extends DatabaseConnector {
 
-	public Invite() throws Exception {
+	public FriendsInvite() throws Exception {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -162,7 +162,7 @@ public class Invite extends DatabaseConnector {
 		try {
 			
 	    	
-	        String sqlStatement = "insert into invite(inviteId, email, expiryTime, isDeleted, createdDate, updateDate, user_userId) values (?, ?, ?, ? ,? ,? ,?);";  
+	        String sqlStatement = "insert into invite(inviteId, email, expiryTime, isDeleted, createdDate, updateDate, userId) values (?, ?, ?, ? ,? ,? ,?);";  
 	        
 	        
 	        Calendar cal  = Calendar.getInstance();
@@ -210,30 +210,24 @@ public class Invite extends DatabaseConnector {
 		}
 	}
 	
-	private String getLastInvite() {
-		
-		 try {
-			 String selectStatement = "select inviteId from invite ORDER BY inviteId DESC LIMIT 1;";
-	         
-	         PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-	         
-	         ResultSet rs = prepStmt.executeQuery();
-	         
-	         if (rs.next()) {
-	        	 
-	        	 String inviteId = rs.getString("inviteId");
-	        	 prepStmt.close();
-	        	 return inviteId;
-	         }
-	         else {
-	        	 return "";
-	         }
-		 }
-		 catch(Exception e) {
-			 return "";
-		 }
+	private String getLastInvite() throws Exception {
+		String selectStatement = "select inviteId from invite ORDER BY inviteId DESC LIMIT 1;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			String inviteId = rs.getString("inviteId");
+			prepStmt.close();
+			return inviteId;
+		} else {
+			return "";
+		}
+
 	}
-	
+
 	private Pair<Integer, String> getSingleInvite(String inviteId) {
 		try {
 			 String selectStatement = "select * from invite where inviteId = ?;";
