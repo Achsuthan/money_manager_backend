@@ -124,15 +124,25 @@ public class FriendInvite extends DatabaseConnector {
 				//Check invite 
 				if (checkInviteIdExist(inviteId)) {
 
-					String selectStatement = "delete from invite where inviteId=?;";
-					PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-					prepStmt.setString(1, inviteId);
+					if(checkUserExistForInvite(userId, inviteId)) {
+						
+						String selectStatement = "delete from invite where inviteId=?;";
+						PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+						prepStmt.setString(1, inviteId);
 
-					prepStmt.executeUpdate();
+						prepStmt.executeUpdate();
+						
+						//Invite deleted successfully
+						return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
+								InviteConstants.inviteDeletedSuccessfully));
+					}
+					else {
+						
+						//Invite deleted successfully
+						return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
+								InviteConstants.noAccess));
+					}
 					
-					//Invite deleted successfully
-					return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
-							InviteConstants.inviteDeletedSuccessfully));
 				} else {
 					
 					//Invite Id not found
@@ -153,6 +163,25 @@ public class FriendInvite extends DatabaseConnector {
 			//Exception
 			System.out.println("Yoo yooo" + e);
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+	
+	//user exist for the invite
+	public Boolean checkUserExistForInvite(String userId, String inviteId) throws Exception {
+		
+		String selectStatement = "select * from invite where inviteId = ? AND userId=?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, inviteId);
+		prepStmt.setString(2, userId);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
