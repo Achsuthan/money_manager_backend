@@ -59,9 +59,11 @@ public class User extends DatabaseConnector {
 		}
 	}
 
+	//Handle the login logic
 	public Pair<Integer, String> login(String email, String password) {
 
 		try {
+			
 			String selectStatement = "select * " + "from user where email = ?";
 
 			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
@@ -74,8 +76,10 @@ public class User extends DatabaseConnector {
 				String hasedPassword = rs.getString("password");
 				String saltDb = rs.getString("salt");
 
+				// Success response for user
 				if (hasedPassword.equals(hashPassword(password + saltDb))) {
 
+					// TODO: Can think about mail service that we can send notification user logged in
 					JSONObject body = new JSONObject();
 					body.put("userId", rs.getString("userId"));
 					body.put("email", rs.getString("email"));
@@ -85,6 +89,7 @@ public class User extends DatabaseConnector {
 							UserConstants.loginSuccessfully, body));
 				} else {
 
+					// Password Failure case
 					prepStmt.close();
 					remove();
 					return new Pair<Integer, String>(400,
@@ -92,6 +97,7 @@ public class User extends DatabaseConnector {
 				}
 			} else {
 
+				//Email not exist 
 				prepStmt.close();
 				remove();
 				return new Pair<Integer, String>(400,
@@ -100,6 +106,7 @@ public class User extends DatabaseConnector {
 
 		} catch (Exception ex) {
 
+			//Exception handler
 			remove();
 			System.out.println(ex);
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
