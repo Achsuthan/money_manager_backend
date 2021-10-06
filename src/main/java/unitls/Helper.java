@@ -15,5 +15,11 @@ public class Helper {
 		intId = intId + 1;
 		return key + "-" + intId;
 	}
+	
+	public static String createInviteLink(String inviteId) {
+		
+		//TODO: need to send the actual invite link
+		return inviteId;
+	}
 
 }
