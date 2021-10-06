@@ -17,6 +17,7 @@ import unitls.Helper;
 import unitls.LogsHandler;
 import unitls.Pair;
 import unitls.ResponseType;
+import unitls.TokenHanler;
 
 /**
  * Servlet implementation class FriendRequest
@@ -45,25 +46,36 @@ public class FriendRequest extends HttpServlet {
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
+			
+			//user session handler
+			if (TokenHanler.checkToken()) { 
+				String userId = request.getParameter("userId");
 
-			String userId = request.getParameter("userId");
+				//UserId required
+				if (userId != null) {
 
-			if (userId != null) {
+					//Get all the invites
+					database.FriendRequest friendRequest = new database.FriendRequest();
+					Pair<Integer, String> loginOutput = friendRequest.getAllRequest(userId);
+					response.setStatus(loginOutput.getKey());
+					out.print(loginOutput.getValue());
 
-				database.FriendRequest friendRequest = new database.FriendRequest();
-				Pair<Integer, String> loginOutput = friendRequest.getAllRequest(userId);
-				response.setStatus(loginOutput.getKey());
-				out.print(loginOutput.getValue());
+				} else {
 
-			} else {
-
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+				}
 			}
-
+			else {
+				
+				//User session failure
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
+			}
 			out.flush();
 		} catch (Exception e) {
-			LogsHandler.logs();
+			
+			//Exception
 			throw new ServletException(e);
 		}
 	}
@@ -79,29 +91,44 @@ public class FriendRequest extends HttpServlet {
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 
-			String friendId = request.getParameter("friendId");
-			String userId = request.getParameter("userId");
+			//user session handler
+			if (TokenHanler.checkToken()) { 
+				
+				String friendId = request.getParameter("friendId");
+				String userId = request.getParameter("userId");
 
-			if (friendId != null && userId != null) {
+				//Friend Id and user Id required
+				if (friendId != null && userId != null) {
 
-				if (friendId != userId) {
+					//Friend Id and User ID can't be equal
+					if (friendId != userId) {
+						
+						//Create the friend request
+						database.FriendRequest friendRequest = new database.FriendRequest();
+						Pair<Integer, String> loginOutput = friendRequest.sendFriendRequest(userId, friendId);
+						response.setStatus(loginOutput.getKey());
+						out.print(loginOutput.getValue());
+					} else {
 
-					database.FriendRequest friendRequest = new database.FriendRequest();
-					Pair<Integer, String> loginOutput = friendRequest.sendFriendRequest(userId, friendId);
-					response.setStatus(loginOutput.getKey());
-					out.print(loginOutput.getValue());
+						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE,
+								FriendRequestConstraints.sameUserRequest));
+					}
+
 				} else {
 
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE,
-							FriendRequestConstraints.sameUserRequest));
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
-
-			} else {
-
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+				
 			}
+			else {
+				
+				//User session failure
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
+			}
+			
 
 			out.flush();
 		} catch (Exception e) {
@@ -109,5 +136,55 @@ public class FriendRequest extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
+	
+	
+	/**
+	 * @see HttpServlet#doDelte(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+		try {
+
+			response.setContentType("application/json");
+			response.setCharacterEncoding("utf-8");
+			PrintWriter out = response.getWriter();
+
+			//user session handler
+			if (TokenHanler.checkToken()) { 
+				
+				String friendRequestId = request.getParameter("friendRequestId");
+				String userId = request.getParameter("userId");
+
+				//Friend Id and user Id required
+				if (friendRequestId != null && userId != null) {
+
+					//Create the friend request
+					database.FriendRequest friendRequest = new database.FriendRequest();
+					Pair<Integer, String> loginOutput = friendRequest.deleteFriendRequest(userId, friendRequestId);
+					response.setStatus(loginOutput.getKey());
+					out.print(loginOutput.getValue());
+
+				} else {
+
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+				}
+				
+			}
+			else {
+				
+				//User session failure
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
+			}
+			
+
+			out.flush();
+		} catch (Exception e) {
+			LogsHandler.logs();
+			throw new ServletException(e);
+		}
+	}
+
 
 }

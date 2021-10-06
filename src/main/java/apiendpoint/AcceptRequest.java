@@ -14,6 +14,7 @@ import unitls.ApiResponseHandler;
 import unitls.LogsHandler;
 import unitls.Pair;
 import unitls.ResponseType;
+import unitls.TokenHanler;
 
 /**
  * Servlet implementation class AcceptRequest
@@ -41,20 +42,33 @@ public class AcceptRequest extends HttpServlet {
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 			
-			String friendReqeustId = request.getParameter("friendsRequestId");
-			
-			if(friendReqeustId != null) {
+			//user session handler
+			if (TokenHanler.checkToken()) { 
 				
-				database.FriendRequest friendRequest = new database.FriendRequest();
-				Pair<Integer, String> loginOutput = friendRequest.acceptFriendRequest(friendReqeustId);
-				response.setStatus(loginOutput.getKey());
-				out.print(loginOutput.getValue());
+				String friendReqeustId = request.getParameter("friendsRequestId");
+				String userId = request.getParameter("userId");
+				//Friend requestId required
+				if(friendReqeustId != null) {
+					
+					//Accept friend request
+					database.FriendRequest friendRequest = new database.FriendRequest();
+					Pair<Integer, String> loginOutput = friendRequest.acceptFriendRequest(friendReqeustId, userId);
+					response.setStatus(loginOutput.getKey());
+					out.print(loginOutput.getValue());
+				}
+				else {
+					
+					//Friend RequestId not exist
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+				}
 			}
 			else {
-				
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+				//User session failure
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
 			}
+			
 			
 			out.flush();
 		}
