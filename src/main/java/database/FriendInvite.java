@@ -32,7 +32,10 @@ public class FriendInvite extends DatabaseConnector {
 				System.out.println("user exist");
 
 				if (user.checkEmailExisit(email)) {
-					return handleCreateInviteLink(email, userId);
+					
+					remove();
+					return new Pair<Integer, String>(400,
+							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userEmailNotExist));
 				} else {
 					return handleCreateInviteLink(email, userId);
 				}
@@ -54,7 +57,7 @@ public class FriendInvite extends DatabaseConnector {
 		try {
 			System.out.println("email exist");
 
-			Pair<Integer, String> emailStatus = checkEmailExist(email);
+			Pair<Integer, String> emailStatus = getInviteLink(email);
 			System.out.println("status " + emailStatus.getKey());
 
 			switch (emailStatus.getKey()) {
@@ -141,56 +144,87 @@ public class FriendInvite extends DatabaseConnector {
 	public Pair<Integer, String> acceptInvite(String email, String name, String password, String inviteId) {
 
 		try {
+			
+			if(!checkEmailAndInviteId(email, inviteId)) {
+				
+				remove();
+				return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
+						InviteConstants.emailOrInviteIdNotExist));
+			}else {
+				
+				//Register user first in the system 
+				User user = new User();
+				Pair<Integer, String> registerOutput = user.register(email, name, password, false);
+				
+				if (registerOutput.getKey() == 200) {
+					
+					ResultSet singleInvite = getSingleInvite(inviteId);
 
-			User user = new User();
-			Pair<Integer, String> registerOutput = user.register(email, name, password, false);
-			if (registerOutput.getKey() == 200) {
-				ResultSet singleInvite = getSingleInvite(inviteId);
+					if (singleInvite.next()) {
 
-				if (singleInvite.next()) {
-
-					String userId = singleInvite.getString("userId");
-
-					ResultSet singleUserDetails = user.getSingleUserDetailsByEmail(email);
-					if (singleUserDetails.next()) {
-						String friendId = singleUserDetails.getString("userId");
-						FriendRequest friend = new FriendRequest();
-						Pair<Integer, String> friedResult = friend.createFriends(userId, friendId);
-						if (friedResult.getKey() == 200) {
-							FriendInvite invite = new FriendInvite();
-							Pair<Integer, String> inviteResult = invite.deleteInvite(inviteId, friendId);
-							if (inviteResult.getKey() == 200) {
-								return new Pair<Integer, String>(200, ApiResponseHandler
-										.apiResponse(ResponseType.SUCCESS, UserConstants.userRegisterSuccessfully));
+						String userId = singleInvite.getString("userId");
+						ResultSet singleUserDetails = user.getSingleUserDetailsByEmail(email);
+						
+						if (singleUserDetails.next()) {
+							
+							//Create the friends once the invite is accepted and created the account
+							String friendId = singleUserDetails.getString("userId");
+							FriendRequest friend = new FriendRequest();
+							Pair<Integer, String> friedResult = friend.createFriends(userId, friendId);
+							
+							if (friedResult.getKey() == 200) {
+								
+								Pair<Integer, String> inviteResult = deleteInvite(inviteId, friendId);
+								
+								if (inviteResult.getKey() == 200) {
+									
+									remove();
+									return new Pair<Integer, String>(200, ApiResponseHandler
+											.apiResponse(ResponseType.SUCCESS, UserConstants.userRegisterSuccessfully));
+								} else {
+									
+									//Delete invite failed
+									remove();
+									return new Pair<Integer, String>(400, ApiResponseHandler
+											.apiResponse(ResponseType.FAILURE, InviteConstants.acceptInviteFailed));
+								}
+								
 							} else {
-								return new Pair<Integer, String>(400, ApiResponseHandler
-										.apiResponse(ResponseType.FAILURE, InviteConstants.acceptInviteFailed));
+											
+								//create friends failed
+								remove();
+								return friedResult;
 							}
 						} else {
+							
+							//Get single user get failed
 							remove();
-							return friedResult;
+							return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
+									InviteConstants.acceptInviteFailed));
 						}
 					} else {
+						
+						//Get single invite get failed
 						remove();
-						return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
-								InviteConstants.acceptInviteFailed));
+						return new Pair<Integer, String>(400,
+								ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.acceptInviteFailed));
 					}
 				} else {
-					remove();
-					return new Pair<Integer, String>(400,
-							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.acceptInviteFailed));
+					
+					//Register error message
+					return registerOutput;
 				}
-			} else {
-				return registerOutput;
 			}
 
 		} catch (Exception e) {
 
+			//Exception
 			System.out.println("Yoo yooo" + e);
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
 	}
 
+	//Invite ID check
 	public Boolean checkInviteIdExist(String inviteId) throws Exception {
 
 		String selectStatement = "select * from invite where inviteId = ?;";
@@ -207,8 +241,33 @@ public class FriendInvite extends DatabaseConnector {
 			return false;
 		}
 	}
+	
+	//Check the email address is exist
+	private Boolean checkEmailAndInviteId(String email, String inviteId) throws Exception {
+		String selectStatement = "select * from invite where email = ? AND inviteId=? ;";
 
-	private Pair<Integer, String> checkEmailExist(String email) throws Exception {
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, email);
+		prepStmt.setString(2, inviteId);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			prepStmt.close();
+			return true;
+
+		} else {
+
+			prepStmt.close();
+			return false;
+		}
+
+	}
+	
+	
+
+	private Pair<Integer, String> getInviteLink(String email) throws Exception {
 		String selectStatement = "select * from invite where email = ?;";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);

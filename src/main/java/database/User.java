@@ -28,10 +28,14 @@ public class User extends DatabaseConnector {
 		// TODO Auto-generated constructor stub
 	}
 
+	//User Registration handle here
 	public Pair<Integer, String> register(String email, String name, String password, Boolean isCloseConection) {
+		
 		try {
+			
 			String lastId = getLastUser();
 			if (!lastId.isEmpty()) {
+				
 				if (checkEmailExisit(email)) {
 
 					remove();
@@ -47,6 +51,7 @@ public class User extends DatabaseConnector {
 				}
 			} else {
 
+				//First user
 				Pair<Integer, String> res = registerUser(UserConstants.firstUserId, email, name, password);
 				remove();
 				return res;
@@ -113,6 +118,7 @@ public class User extends DatabaseConnector {
 		}
 	}
 
+	//Check email exist or not
 	public boolean checkEmailExisit(String email) throws Exception {
 
 		String selectStatement = "select *  from user where email = ?;";
@@ -134,6 +140,7 @@ public class User extends DatabaseConnector {
 
 	}
 
+	//Get the last user ID
 	private String getLastUser() throws Exception {
 
 		String selectStatement = "select userId from user ORDER BY UserId DESC LIMIT 1;";
@@ -148,6 +155,8 @@ public class User extends DatabaseConnector {
 			prepStmt.close();
 			return userId;
 		} else {
+			
+			prepStmt.close();
 			return "";
 		}
 
@@ -203,6 +212,7 @@ public class User extends DatabaseConnector {
 		return rs;
 	}
 
+	// Register user
 	private Pair<Integer, String> registerUser(String userId, String email, String name, String password) throws Exception {
 
 		String salt = getSalt();
@@ -240,13 +250,8 @@ public class User extends DatabaseConnector {
 		}
 
 	}
-
-	private String hashAndSaltPassword(String password) throws NoSuchAlgorithmException {
-
-		String salt = getSalt();
-		return hashPassword(password + salt);
-	}
-
+	
+	//Get the salt 
 	private static String getSalt() {
 
 		Random r = new SecureRandom();
@@ -255,6 +260,7 @@ public class User extends DatabaseConnector {
 		return Base64.getEncoder().encodeToString(saltBytes);
 	}
 
+	//Password hashing
 	private String hashPassword(String password) throws NoSuchAlgorithmException {
 
 		MessageDigest md = MessageDigest.getInstance("SHA-256");

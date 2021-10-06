@@ -21,6 +21,8 @@ public class InviteConstants {
 	public static String iviteNotExist = "Invite is not exist";
 	public static String acceptInviteFailed = "Accept Friend request is failed but you have successfully registered to the system";
 	public static String groupNotExist = "Group is not exist";
+	public static String userEmailNotExist = "User Email is not exist";
+	public static String emailOrInviteIdNotExist = "Your invite link or email address not exists";
 	
 
 }

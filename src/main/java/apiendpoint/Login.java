@@ -52,9 +52,6 @@ public class Login extends HttpServlet {
 
 				if (Helper.isEmailValid(email)) {
 
-				    //Logs event for the user, if needed can add the logic here
-					LogsHandler.logs();
-
 					//Handle the login
 					User user = new User();
 					Pair<Integer, String> loginOutput = user.login(email, password);
