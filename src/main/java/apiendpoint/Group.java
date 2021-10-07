@@ -16,6 +16,7 @@ import unitls.Helper;
 import unitls.LogsHandler;
 import unitls.Pair;
 import unitls.ResponseType;
+import unitls.TokenHanler;
 
 /**
  * Servlet implementation class Group
@@ -37,7 +38,41 @@ public class Group extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		try {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("utf-8");
+			PrintWriter out = response.getWriter();
+
+			String userId = request.getParameter("userId");
+
+			//user session handler
+			if (TokenHanler.checkToken()) { 
+				
+				if (userId != null) {
+					database.Group group = new database.Group();
+					Pair<Integer, String> groupResult = group.getAllGroup(userId);
+					response.setStatus(groupResult.getKey());
+					out.print(groupResult.getValue());
+					
+				} else {
+
+					//User Id not found
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+				}
+
+			}
+			else {
+				
+				//User session failure
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
+			}
+			
+			out.flush();
+		} catch (Exception e) {
+			throw new ServletException(e);
+		}
 	}
 
 	/**
@@ -53,20 +88,36 @@ public class Group extends HttpServlet {
 			String userId = request.getParameter("userId");
 			String groupName = request.getParameter("groupName");
 
-			if (userId != null && groupName != null) {
-				database.Group group = new database.Group();
-				Pair<Integer, String> groupResult = group.createGroup(userId, groupName);
-				response.setStatus(groupResult.getKey());
-				out.print(groupResult.getValue());
+			//user session handler
+			if (TokenHanler.checkToken()) { 
 				
-			} else {
+				//UserId and group name check
+				if (userId != null && groupName != null) {
+					
+					database.Group group = new database.Group();
+					Pair<Integer, String> groupResult = group.createGroup(userId, groupName);
+					response.setStatus(groupResult.getKey());
+					out.print(groupResult.getValue());
+					
+				} else {
 
-				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+					//Required information not found
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+				}
+
 			}
-
+			else {
+				
+				//User session failure
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
+			}
+			
 			out.flush();
 		} catch (Exception e) {
+			
+			//Exception
 			throw new ServletException(e);
 		}
 	}
