@@ -19,4 +19,5 @@ public class FriendRequestConstraints {
 	public static String friendsCreationFailed = "Something went wrond when create friends please try again later";
 	public static String noAccess = "You don't have the access";
 	public static String deletedSuccess = "Friend request deleted successfuly";
+	public static String senderAccessNotAvailable = "Sender can't access the friend request";  
 }

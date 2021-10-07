@@ -24,76 +24,49 @@ import unitls.TokenHanler;
 @WebServlet("/group-invite")
 public class GroupInvite extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public GroupInvite() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+	public GroupInvite() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		try {
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 
+			// Handle the session
 			if (TokenHanler.checkToken()) {
 
-				String email = request.getParameter("email");
 				String userId = request.getParameter("userId");
-				String groupId = request.getParameter("groupId");
-				String accessLevel = request.getParameter("accessLevel");
 
-				if (email != null && userId != null) {
-					
-					Integer accesslevl = Integer.parseInt(accessLevel);
+				if (userId != null) {
 
-					if (email != null && userId != null) {
+					//Valid email
+					database.GroupInvite invite = new database.GroupInvite();
+					Pair<Integer, String> loginOutput = invite.getAllGroupInivite(userId);
+					response.setStatus(loginOutput.getKey());
+					out.print(loginOutput.getValue());
 
-						if (Helper.isEmailValid(email)) {
-
-							LogsHandler.logs();
-
-							database.GroupInvite invite = new database.GroupInvite();
-							Pair<Integer, String> loginOutput = invite.createGroupInvite(userId, accesslevl, email, groupId);
-							response.setStatus(loginOutput.getKey());
-							out.print(loginOutput.getValue());
-
-						}
-
-						else {
-
-							LogsHandler.logs();
-							response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-							out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE,
-									InviteConstants.emailFormatRequired));
-						}
-
-					} else {
-
-						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-						out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
-					}
 				} else {
+
+					// Email and userId not found
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.fieldsMissing));
 				}
 			} else {
 
+				// Not authorisation
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
 			}
@@ -102,8 +75,71 @@ public class GroupInvite extends HttpServlet {
 
 		} catch (Exception e) {
 
+			// Exception handle
 			System.out.println(e);
-			LogsHandler.logs();
+			throw new ServletException(e);
+		}
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		try {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("utf-8");
+			PrintWriter out = response.getWriter();
+
+			// Handle the session
+			if (TokenHanler.checkToken()) {
+
+				String reciverId = request.getParameter("reciverId");
+				String userId = request.getParameter("userId");
+				String groupId = request.getParameter("groupId");
+				String accessLevel = request.getParameter("accessLevel");
+
+				if (reciverId != null && userId != null) {
+
+					if(reciverId.equals(userId)) {
+						
+						// Email and userId not found
+						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+						out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.sameUserRequest));
+					}
+					else {
+						
+						Integer accesslevl = Integer.parseInt(accessLevel);
+
+						//Valid email
+						database.GroupInvite invite = new database.GroupInvite();
+						Pair<Integer, String> loginOutput = invite.createGroupInvite(userId, accesslevl, reciverId, groupId);
+						response.setStatus(loginOutput.getKey());
+						out.print(loginOutput.getValue());
+					}
+					
+
+				} else {
+
+					// Email and userId not found
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.fieldsMissing));
+				}
+			} else {
+
+				// Not authorisation
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
+			}
+
+			out.flush();
+
+		} catch (Exception e) {
+
+			// Exception handle
+			System.out.println(e);
 			throw new ServletException(e);
 		}
 	}

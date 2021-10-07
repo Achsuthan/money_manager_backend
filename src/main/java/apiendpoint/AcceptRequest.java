@@ -48,7 +48,7 @@ public class AcceptRequest extends HttpServlet {
 				String friendReqeustId = request.getParameter("friendsRequestId");
 				String userId = request.getParameter("userId");
 				//Friend requestId required
-				if(friendReqeustId != null) {
+				if(friendReqeustId != null && userId != null) {
 					
 					//Accept friend request
 					database.FriendRequest friendRequest = new database.FriendRequest();

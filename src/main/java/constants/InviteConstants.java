@@ -24,6 +24,10 @@ public class InviteConstants {
 	public static String userEmailNotExist = "User Email is not exist";
 	public static String emailOrInviteIdNotExist = "Your invite link or email address not exists";
 	public static String noAccess = "You don't have the access";
+	public static String reciverUserNotFound = "Reciver not found";
+	public static String userAlreadyInGroup = "The user already in the group";
+	public static String sameUserRequest = "You can't request yourself to your group";
+	public static String noFriends = "Both of you are not friends";
 	
 
 }

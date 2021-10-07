@@ -21,6 +21,7 @@ public class Group extends DatabaseConnector {
 		// TODO Auto-generated constructor stub
 	}
 	
+	//Create group
 	public Pair<Integer, String> createGroup(String userId, String groupName) {
 		
 		try {
@@ -147,6 +148,26 @@ public class Group extends DatabaseConnector {
 		return rs;
 	}
 	
+	// Check user already exist in the access level
+	public Boolean checkUserAlreadyHaveAccessToSameGroup(String userId, String groupId) throws Exception {
+
+		String selectStatement = "select * from access_level where userId=? AND groupId=? AND isAccepted = ?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, userId);
+		prepStmt.setString(2, groupId);
+		prepStmt.setBoolean(3, true);
+		ResultSet rs = prepStmt.executeQuery();
+
+		if(rs.next()) {
+			
+			prepStmt.close();
+			return true;
+		}
+		
+		return false;
+	}
+	
 	// Get all Access Level based on the user
 	private ResultSet getAllAccessLevelBasedOnUser(String userId) throws Exception {
 
@@ -178,7 +199,24 @@ public class Group extends DatabaseConnector {
 		}
 	}
 	
+	public Boolean checkOwerner(String userId, String groupId) throws Exception {
+		
+		String selectStatement = "select * from access_level where groupId = ? AND userId=? AND level=?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, groupId);
+		prepStmt.setString(2, userId);
+		prepStmt.setInt(3, 0);
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
+	//Group check
 	public Boolean checkGroupExist(String groupId) throws Exception{
 
 		String selectStatement = "select * from spending_group where groupId = ?;";
@@ -211,9 +249,9 @@ public class Group extends DatabaseConnector {
 		prepStmt.setBoolean(5, false);
 		prepStmt.setString(6, userId);
 
-		ResultSet x = prepStmt.getGeneratedKeys();
+		int x = prepStmt.executeUpdate();
 
-		if (x.next()) {
+		if (x == 1) {
 			
 			prepStmt.close();
 			return createAccessLevel(userId, groupId);
