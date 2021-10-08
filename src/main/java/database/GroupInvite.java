@@ -97,6 +97,108 @@ public class GroupInvite extends DatabaseConnector {
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
 	}
+	
+	// Create group Invite link
+	/*
+	 * 1. Check user 
+	 * 2. Check the  groupInvite 
+	 * 3. User in the group invite
+	 * 4. Check the expire time 
+	 * 5. Create the Access Level 
+	 * 6. Delete the group invite
+	 */
+	public Pair<Integer, String> acceptGroupInvite(String userId, String groupInviteId) {
+
+		try {
+
+			// User check
+			User user = new User();
+			if (user.CheckUserExist(userId)) {
+				
+				ResultSet result = getSingleInvite(groupInviteId);
+				
+				if(result.next()) {
+					
+					String receiverUserId = result.getString("reciveruserId");
+					
+					if(userId.equals(receiverUserId)) {
+						
+						
+						Calendar cal = Calendar.getInstance();
+						long timeNow = cal.getTimeInMillis();
+						java.sql.Timestamp currentTime = new java.sql.Timestamp(timeNow);
+						
+						java.sql.Timestamp expiryTime = result.getTimestamp("expiryTime");
+						
+						if (expiryTime.compareTo(currentTime) > 0) {
+
+							Integer accessLevel = result.getInt("accessLevel");
+							String groupId  = result.getString("inviteGroupId");
+							
+							if(deleteSingleInvite(groupInviteId)) {
+								
+								Group group = new Group();
+								return group.createAccessLevel(userId, groupId, accessLevel, true);
+							}
+							else {
+								
+								// user not found
+								remove();
+								return new Pair<Integer, String>(400,
+										ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.deleteGroupInviteFailed));
+							}
+						} 
+						else {
+							
+							// user not found
+							remove();
+							return new Pair<Integer, String>(400,
+									ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.linkExpired));
+						}
+						
+					}
+					else {
+						
+						// user not found
+						remove();
+						return new Pair<Integer, String>(400,
+								ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.noAccess));
+					}
+				}
+				else {
+					
+					// user not found
+					remove();
+					return new Pair<Integer, String>(400,
+							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.iviteNotExist));
+				}
+
+			} else {
+
+				// user not found
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userNotExist));
+			}
+		} catch (Exception e) {
+
+			System.out.println("error error " + e);
+			// Exception
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+	
+	private Boolean deleteSingleInvite(String groupInviteId) throws Exception {
+		
+		String selectStatement = "delete from group_invite where groupInviteId=?;";
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, groupInviteId);
+
+		prepStmt.executeUpdate();
+		
+		return true;
+	}
 
 	public Pair<Integer, String> getAllGroupInivite(String userId) {
 		try {
@@ -203,7 +305,6 @@ public class GroupInvite extends DatabaseConnector {
 			}
 			case 500: {
 
-				System.out.println("error error ");
 				// Server error
 				remove();
 				return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
@@ -236,7 +337,6 @@ public class GroupInvite extends DatabaseConnector {
 			}
 		} catch (Exception e) {
 
-			System.out.println("error error " + e);
 			// Exception
 			remove();
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
@@ -301,7 +401,6 @@ public class GroupInvite extends DatabaseConnector {
 			}
 		} catch (Exception e) {
 
-			System.out.println("error error " + e);
 			// Exception
 			remove();
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));

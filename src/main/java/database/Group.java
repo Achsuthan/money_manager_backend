@@ -216,8 +216,9 @@ public class Group extends DatabaseConnector {
 		}
 	}
 	
-	//Group check
-	public Boolean checkGroupExist(String groupId) throws Exception{
+	
+	// Group check
+	public Boolean checkGroupExist(String groupId) throws Exception {
 
 		String selectStatement = "select * from spending_group where groupId = ?;";
 
@@ -254,7 +255,7 @@ public class Group extends DatabaseConnector {
 		if (x == 1) {
 			
 			prepStmt.close();
-			return createAccessLevel(userId, groupId);
+			return createAccessLevel(userId, groupId, 0, true);
 		} else {
 			
 			prepStmt.close();
@@ -265,7 +266,7 @@ public class Group extends DatabaseConnector {
 	}
 	
 	//Create access level
-	private Pair<Integer, String> createAccessLevel(String userId, String groupId) throws Exception {
+	public Pair<Integer, String> createAccessLevel(String userId, String groupId, Integer accessLevel, Boolean isAccepted) throws Exception {
 		
 		//Last Access Level Id
 		String accessLevelId = getLastAccessLevel();
@@ -284,8 +285,8 @@ public class Group extends DatabaseConnector {
 
 		PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
 		prepStmt.setString(1, accessLevelId);
-		prepStmt.setInt(2, 0);
-		prepStmt.setBoolean(3, true);
+		prepStmt.setInt(2, accessLevel);
+		prepStmt.setBoolean(3, isAccepted);
 		prepStmt.setBoolean(4, false);
 		prepStmt.setTimestamp(5, ts);
 		prepStmt.setTimestamp(6, ts);

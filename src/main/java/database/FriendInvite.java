@@ -337,6 +337,7 @@ public class FriendInvite extends DatabaseConnector {
 	
 	//Check the email address is exist
 	private Boolean checkEmailAndInviteId(String email, String inviteId) throws Exception {
+		
 		String selectStatement = "select * from invite where email = ? AND inviteId=? ;";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
@@ -469,6 +470,7 @@ public class FriendInvite extends DatabaseConnector {
 
 	//Get the last user id
 	private String getLastInvite() throws Exception {
+		
 		String selectStatement = "select inviteId from invite ORDER BY inviteId DESC LIMIT 1;";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);

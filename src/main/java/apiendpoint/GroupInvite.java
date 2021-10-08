@@ -101,7 +101,7 @@ public class GroupInvite extends HttpServlet {
 				String groupId = request.getParameter("groupId");
 				String accessLevel = request.getParameter("accessLevel");
 
-				if (reciverId != null && userId != null) {
+				if (reciverId != null && userId != null && groupId != null && accessLevel != null) {
 
 					if(reciverId.equals(userId)) {
 						
