@@ -14,19 +14,13 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "email",
-									"value": "1@1.com",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "121",
-									"type": "text"
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"1@1.com\",\n    \"password\": \"Pass@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/login",
@@ -46,29 +40,42 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "email",
-									"value": "100@1.com",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "121",
-									"type": "text"
-								},
-								{
-									"key": "name",
-									"value": "achsuthan",
-									"type": "text"
-								},
-								{
-									"key": "inviteId",
-									"value": "INV-11111111",
-									"type": "text"
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"1@1.com\",\n    \"password\": \"Pass@123\",\n    \"name\": \"Testing\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"register"
 							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register with Accept Invite",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"1@1.com\",\n    \"password\": \"Pass@123\",\n    \"name\": \"Testing\", \n    \"inviteId\": \"INV-11111111\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/register",
@@ -94,18 +101,12 @@
 						"header": [],
 						"body": {
 							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "userId",
-									"value": "USR-11111111",
-									"type": "text"
-								},
-								{
-									"key": "email",
-									"value": "101@1.com",
-									"type": "text"
+							"urlencoded": [],
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/friend-invite",
@@ -156,7 +157,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/friend-invite?userId=USR-11111111",
+							"raw": "{{baseUrl}}/friend-invite?userId=USR-11111113",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -166,7 +167,7 @@
 							"query": [
 								{
 									"key": "userId",
-									"value": "USR-11111111"
+									"value": "USR-11111113"
 								}
 							]
 						}
@@ -184,19 +185,13 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "userId",
-									"value": "USR-11111114",
-									"type": "text"
-								},
-								{
-									"key": "friendId",
-									"value": "USR-11111111",
-									"type": "text"
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"friendId\": \"USR-11111112\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/friend-request",
@@ -216,14 +211,13 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "friendsRequestId",
-									"value": "FRI-11111112",
-									"type": "text"
+							"mode": "raw",
+							"raw": "{\n    \"friendsRequestId\": \"FRI-11111111\",\n    \"userId\": \"USR-11111111\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/accept-request",
@@ -257,7 +251,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/friend-request?userId=USR-11111111",
+							"raw": "{{baseUrl}}/friend-request?userId=USR-11111114",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -267,7 +261,7 @@
 							"query": [
 								{
 									"key": "userId",
-									"value": "USR-11111111"
+									"value": "USR-11111114"
 								}
 							]
 						}
@@ -316,24 +310,13 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "keyword",
-									"value": "an",
-									"type": "text"
-								},
-								{
-									"key": "userId",
-									"value": "USR-11111111",
-									"type": "text"
-								},
-								{
-									"key": "searchType",
-									"value": "2",
-									"type": "text"
+							"mode": "raw",
+							"raw": "{\n    \"keyword\": \"an\",\n    \"userId\": \"USR-11111111\",\n    \"searchType\": \"2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/search",
@@ -358,29 +341,13 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "email",
-									"value": "101@1.com",
-									"type": "text"
-								},
-								{
-									"key": "userId",
-									"value": "USR-11111111",
-									"type": "text"
-								},
-								{
-									"key": "accessLevel",
-									"value": "1",
-									"type": "text"
-								},
-								{
-									"key": "groupId",
-									"value": "GRP-11111116",
-									"type": "text"
+							"mode": "raw",
+							"raw": "{\n    \"reciverId\": \"USR-11111112\",\n    \"userId\": \"USR-11111111\",\n    \"accessLevel\": \"2\",\n    \"groupId\": \"GRP-11111111\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/group-invite",
@@ -389,6 +356,55 @@
 							],
 							"path": [
 								"group-invite"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Group Invite",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group-invite?userId=USR-11111112",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group-invite"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111112"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Group Invite",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"groupInviteId\": \"GIV-11111111\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/accept_group_invite",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"accept_group_invite"
 							]
 						}
 					},
@@ -405,19 +421,13 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [
-								{
-									"key": "userId",
-									"value": "USR-11111112",
-									"type": "text"
-								},
-								{
-									"key": "groupName",
-									"value": "Testing",
-									"type": "text"
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"groupName\": \"Project Dirty Mind\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							]
+							}
 						},
 						"url": {
 							"raw": "{{baseUrl}}/create-group",
@@ -426,6 +436,29 @@
 							],
 							"path": [
 								"create-group"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/create-group?userId=USR-11111111",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"create-group"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111111"
+								}
 							]
 						}
 					},
