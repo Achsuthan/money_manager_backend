@@ -56,25 +56,16 @@ public class GroupInvite extends HttpServlet {
 			// Handle the session
 			if (TokenHanler.checkToken()) {
 
-				StringBuffer jb = new StringBuffer();
-				String line = null;
+				String userId = request.getParameter("userId");
 
-				BufferedReader reader = request.getReader();
-				while ((line = reader.readLine()) != null)
-					jb.append(line);
+				if (userId != null) {
 
-				JSONObject jsonBody = new JSONObject(jb.toString());
-
-				try {
-
-					String userId = (String) jsonBody.get("userId");
 					// Valid email
 					database.GroupInvite invite = new database.GroupInvite();
 					Pair<Integer, String> loginOutput = invite.getAllGroupInivite(userId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
-
-				} catch (JSONException e) {
+				} else {
 
 					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

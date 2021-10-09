@@ -54,26 +54,17 @@ public class FriendRequest extends HttpServlet {
 			// user session handler
 			if (TokenHanler.checkToken()) {
 
-				StringBuffer jb = new StringBuffer();
-				String line = null;
+				
+				String userId = request.getParameter("userId");
 
-				BufferedReader reader = request.getReader();
-				while ((line = reader.readLine()) != null)
-					jb.append(line);
-
-				JSONObject jsonBody = new JSONObject(jb.toString());
-
-				try {
-
-					String userId = (String) jsonBody.get("userId");
+				if (userId != null) {
 
 					// Get all the invites
 					database.FriendRequest friendRequest = new database.FriendRequest();
 					Pair<Integer, String> loginOutput = friendRequest.getAllRequest(userId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
-
-				} catch (JSONException e) {
+				} else {
 
 					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -171,27 +162,18 @@ public class FriendRequest extends HttpServlet {
 			// user session handler
 			if (TokenHanler.checkToken()) {
 
-				StringBuffer jb = new StringBuffer();
-				String line = null;
+				String friendRequestId = request.getParameter("friendRequestId");
+				String userId = request.getParameter("userId");
 
-				BufferedReader reader = request.getReader();
-				while ((line = reader.readLine()) != null)
-					jb.append(line);
 
-				JSONObject jsonBody = new JSONObject(jb.toString());
-
-				try {
-
-					String friendRequestId = (String) jsonBody.get("friendRequestId");
-					String userId = (String) jsonBody.get("userId");
+				if (userId != null && friendRequestId != null) {
 
 					// Create the friend request
 					database.FriendRequest friendRequest = new database.FriendRequest();
 					Pair<Integer, String> loginOutput = friendRequest.deleteFriendRequest(userId, friendRequestId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
-
-				} catch (JSONException e) {
+				} else {
 
 					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

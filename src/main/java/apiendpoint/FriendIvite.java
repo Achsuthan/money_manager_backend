@@ -55,27 +55,17 @@ public class FriendIvite extends HttpServlet {
 
 			// user session handler
 			if (TokenHanler.checkToken()) {
+				
+				String userId = request.getParameter("userId");
 
-				StringBuffer jb = new StringBuffer();
-				String line = null;
-
-				BufferedReader reader = request.getReader();
-				while ((line = reader.readLine()) != null)
-					jb.append(line);
-
-				JSONObject jsonBody = new JSONObject(jb.toString());
-
-				try {
-
-					String userId = (String) jsonBody.get("userId");
+				if (userId != null) {
 
 					// Create invite
 					FriendInvite invite = new FriendInvite();
 					Pair<Integer, String> loginOutput = invite.getAllInvites(userId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
-
-				} catch (JSONException e) {
+				} else {
 
 					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -140,7 +130,7 @@ public class FriendIvite extends HttpServlet {
 					}
 
 					else {
- 
+
 						// Email validation failed
 						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 						out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE,
@@ -186,35 +176,24 @@ public class FriendIvite extends HttpServlet {
 
 			// User Session check
 			if (TokenHanler.checkToken()) {
-				
-				StringBuffer jb = new StringBuffer();
-				String line = null;
 
-				BufferedReader reader = request.getReader();
-				while ((line = reader.readLine()) != null)
-					jb.append(line);
+				String inviteId = request.getParameter("inviteId");
+				String userId = request.getParameter("userId");
 
-				JSONObject jsonBody = new JSONObject(jb.toString());
+				if (inviteId != null && userId != null) {
 
-				try {
-
-					
-					String inviteId = (String) jsonBody.get("inviteId");
-					String userId = (String) jsonBody.get("userId");
-					
 					// Handle the delete invite
 					FriendInvite invite = new FriendInvite();
 					Pair<Integer, String> loginOutput = invite.deleteInvite(inviteId, userId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
-
-				} catch (JSONException e) {
+				} else {
 
 					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
-				
+
 			} else {
 
 				// User session not found
