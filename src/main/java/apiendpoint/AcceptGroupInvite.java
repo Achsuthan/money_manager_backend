@@ -1,5 +1,6 @@
 package apiendpoint;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -9,7 +10,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import constants.InviteConstants;
+import constants.UserConstants;
+import database.User;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
 import unitls.Pair;
@@ -44,22 +50,32 @@ public class AcceptGroupInvite extends HttpServlet {
 			// Handle the session
 			if (TokenHanler.checkToken()) {
 
-				String userId = request.getParameter("userId");
-				String groupInviteId = request.getParameter("groupInviteId");
+				
+				StringBuffer jb = new StringBuffer();
+				String line = null;
 
-				if (groupInviteId != null && userId != null) {
+				BufferedReader reader = request.getReader();
+				while ((line = reader.readLine()) != null)
+					jb.append(line);
 
+				JSONObject jsonBody = new JSONObject(jb.toString());
+
+				try {
+					String userId = (String) jsonBody.get("userId");
+					String groupInviteId = (String) jsonBody.get("groupInviteId");
+					
 					database.GroupInvite invite = new database.GroupInvite();
 					Pair<Integer, String> loginOutput = invite.acceptGroupInvite(userId, groupInviteId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
 
-				} else {
+				} catch (JSONException e) {
 
-					// Email and userId not found
+					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.fieldsMissing));
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
+				
 			} else {
 
 				// Not authorisation

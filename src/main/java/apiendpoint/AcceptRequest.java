@@ -1,5 +1,6 @@
 package apiendpoint;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -9,8 +10,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import constants.FriendRequestConstraints;
+import constants.UserConstants;
+import database.User;
 import unitls.ApiResponseHandler;
+import unitls.Helper;
 import unitls.LogsHandler;
 import unitls.Pair;
 import unitls.ResponseType;
@@ -45,23 +52,34 @@ public class AcceptRequest extends HttpServlet {
 			//user session handler
 			if (TokenHanler.checkToken()) { 
 				
-				String friendReqeustId = request.getParameter("friendsRequestId");
-				String userId = request.getParameter("userId");
-				//Friend requestId required
-				if(friendReqeustId != null && userId != null) {
-					
+				
+				StringBuffer jb = new StringBuffer();
+				String line = null;
+
+				BufferedReader reader = request.getReader();
+				while ((line = reader.readLine()) != null)
+					jb.append(line);
+
+				JSONObject jsonBody = new JSONObject(jb.toString());
+
+				try {
+
+					String friendReqeustId = (String) jsonBody.get("friendsRequestId");
+					String userId = (String) jsonBody.get("userId");
+
 					//Accept friend request
 					database.FriendRequest friendRequest = new database.FriendRequest();
 					Pair<Integer, String> loginOutput = friendRequest.acceptFriendRequest(friendReqeustId, userId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
-				}
-				else {
-					
-					//Friend RequestId not exist
+
+				} catch (JSONException e) {
+
+					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
+				
 			}
 			else {
 				//User session failure

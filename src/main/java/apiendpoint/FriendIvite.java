@@ -1,5 +1,6 @@
 package apiendpoint;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -8,6 +9,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import constants.InviteConstants;
 import constants.UserConstants;
@@ -42,35 +46,45 @@ public class FriendIvite extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
+
 		try {
-			
+
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 
-			//user session handler
+			// user session handler
 			if (TokenHanler.checkToken()) {
 
-				String userId = request.getParameter("userId");
+				StringBuffer jb = new StringBuffer();
+				String line = null;
 
-				//Invite requester userId receiver email required
-				if (userId != null) {
+				BufferedReader reader = request.getReader();
+				while ((line = reader.readLine()) != null)
+					jb.append(line);
 
-					//Create invite
+				JSONObject jsonBody = new JSONObject(jb.toString());
+
+				try {
+
+					String userId = (String) jsonBody.get("userId");
+
+					// Create invite
 					FriendInvite invite = new FriendInvite();
 					Pair<Integer, String> loginOutput = invite.getAllInvites(userId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
-				} else {
-					
-					//Required values missing
+
+				} catch (JSONException e) {
+
+					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.fieldsMissing));
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
+
 			} else {
 
-				//User session failure
+				// User session failure
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
 			}
@@ -79,7 +93,7 @@ public class FriendIvite extends HttpServlet {
 
 		} catch (Exception e) {
 
-			//Exception handler
+			// Exception handler
 			System.out.println(e);
 			LogsHandler.logs();
 			throw new ServletException(e);
@@ -97,19 +111,27 @@ public class FriendIvite extends HttpServlet {
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 
-			//user session handler
+			// user session handler
 			if (TokenHanler.checkToken()) {
 
-				String email = request.getParameter("email");
-				String userId = request.getParameter("userId");
+				StringBuffer jb = new StringBuffer();
+				String line = null;
 
-				//Invite requester userId receiver email required
-				if (email != null && userId != null) {
+				BufferedReader reader = request.getReader();
+				while ((line = reader.readLine()) != null)
+					jb.append(line);
 
-					//Email validation
+				JSONObject jsonBody = new JSONObject(jb.toString());
+
+				try {
+
+					String email = (String) jsonBody.get("email");
+					String userId = (String) jsonBody.get("userId");
+
+					// Email validation
 					if (Helper.isEmailValid(email)) {
 
-						//Create invite
+						// Create invite
 						FriendInvite invite = new FriendInvite();
 						Pair<Integer, String> loginOutput = invite.createInvite(email, userId);
 						response.setStatus(loginOutput.getKey());
@@ -118,21 +140,22 @@ public class FriendIvite extends HttpServlet {
 					}
 
 					else {
-
-						//Email validation failed
+ 
+						// Email validation failed
 						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 						out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE,
 								InviteConstants.emailFormatRequired));
 					}
-				} else {
-					
-					//Required values missing
+
+				} catch (JSONException e) {
+
+					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.fieldsMissing));
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
 			} else {
 
-				//User session failure
+				// User session failure
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
 			}
@@ -141,7 +164,7 @@ public class FriendIvite extends HttpServlet {
 
 		} catch (Exception e) {
 
-			//Exception handler
+			// Exception handler
 			System.out.println(e);
 			LogsHandler.logs();
 			throw new ServletException(e);
@@ -154,36 +177,47 @@ public class FriendIvite extends HttpServlet {
 	 */
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		try {
-			
+
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 
-			//User Session check
+			// User Session check
 			if (TokenHanler.checkToken()) {
+				
+				StringBuffer jb = new StringBuffer();
+				String line = null;
 
-				String inviteId = request.getParameter("inviteId");
-				String userId = request.getParameter("userId");
+				BufferedReader reader = request.getReader();
+				while ((line = reader.readLine()) != null)
+					jb.append(line);
 
-				//UserId and InviteId required
-				if (inviteId != null && userId != null) {
+				JSONObject jsonBody = new JSONObject(jb.toString());
+
+				try {
+
 					
-					//Handle the delete invite
+					String inviteId = (String) jsonBody.get("inviteId");
+					String userId = (String) jsonBody.get("userId");
+					
+					// Handle the delete invite
 					FriendInvite invite = new FriendInvite();
 					Pair<Integer, String> loginOutput = invite.deleteInvite(inviteId, userId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
-				} else {
-					
-					//Data missing
+
+				} catch (JSONException e) {
+
+					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.fieldsMissing));
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
+				
 			} else {
 
-				//User session not found
+				// User session not found
 				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
 			}
@@ -192,7 +226,7 @@ public class FriendIvite extends HttpServlet {
 
 		} catch (Exception e) {
 
-			//Exception
+			// Exception
 			LogsHandler.logs();
 			throw new ServletException(e);
 		}

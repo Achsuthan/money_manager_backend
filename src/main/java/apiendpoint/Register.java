@@ -1,5 +1,6 @@
 package apiendpoint;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -8,6 +9,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.json.HTTP;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import constants.InviteConstants;
 import constants.UserConstants;
@@ -46,20 +51,35 @@ public class Register extends HttpServlet {
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 
-			String email = request.getParameter("email");
-			String password = request.getParameter("password");
-			String name = request.getParameter("name");
-			String inviteId = request.getParameter("inviteId");
+			StringBuffer jb = new StringBuffer();
+			String line = null;
 
-			// Check email, password and name
-			if (email != null && password != null && name != null) {
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+
+			JSONObject jsonBody = new JSONObject(jb.toString());
+
+			try {
+
+				String email = (String) jsonBody.get("email");
+				String password = (String) jsonBody.get("password");
+				String name = (String) jsonBody.get("name");
+
+				String inviteId = "";
+
+				try {
+					inviteId = (String) jsonBody.get("inviteId");
+				} catch (JSONException e) {
+					inviteId = "";
+				}
 
 				if (Helper.isEmailValid(email)) {
 
 					// Invite handle for registration
 					FriendInvite invite = new FriendInvite();
-					if (inviteId != null) {
-						
+					if (!inviteId.isEmpty()) {
+
 						// Handle the register
 						Pair<Integer, String> acceptOutput = invite.acceptInvite(email, name, password, inviteId);
 						response.setStatus(acceptOutput.getKey());
@@ -80,7 +100,7 @@ public class Register extends HttpServlet {
 					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.emailForatRequired));
 				}
 
-			} else {
+			} catch (JSONException e) {
 
 				// All the required data not found in the API body
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -88,6 +108,7 @@ public class Register extends HttpServlet {
 			}
 
 			out.flush();
+
 		} catch (Exception e) {
 			// Exception handler
 			throw new ServletException(e);

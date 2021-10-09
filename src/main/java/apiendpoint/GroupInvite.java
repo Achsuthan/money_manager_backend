@@ -1,5 +1,6 @@
 package apiendpoint;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -9,8 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import constants.InviteConstants;
+import constants.UserConstants;
 import database.FriendInvite;
+import database.User;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
 import unitls.LogsHandler;
@@ -41,8 +47,8 @@ public class GroupInvite extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		try {
-			
-			System.out.println("envirment variable "+ System.getenv().get("PATH"));
+
+			System.out.println("envirment variable " + System.getenv().get("PATH"));
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
@@ -50,21 +56,29 @@ public class GroupInvite extends HttpServlet {
 			// Handle the session
 			if (TokenHanler.checkToken()) {
 
-				String userId = request.getParameter("userId");
+				StringBuffer jb = new StringBuffer();
+				String line = null;
 
-				if (userId != null) {
+				BufferedReader reader = request.getReader();
+				while ((line = reader.readLine()) != null)
+					jb.append(line);
 
-					//Valid email
+				JSONObject jsonBody = new JSONObject(jb.toString());
+
+				try {
+
+					String userId = (String) jsonBody.get("userId");
+					// Valid email
 					database.GroupInvite invite = new database.GroupInvite();
 					Pair<Integer, String> loginOutput = invite.getAllGroupInivite(userId);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
 
-				} else {
+				} catch (JSONException e) {
 
-					// Email and userId not found
+					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.fieldsMissing));
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
 			} else {
 
@@ -98,37 +112,46 @@ public class GroupInvite extends HttpServlet {
 			// Handle the session
 			if (TokenHanler.checkToken()) {
 
-				String reciverId = request.getParameter("reciverId");
-				String userId = request.getParameter("userId");
-				String groupId = request.getParameter("groupId");
-				String accessLevel = request.getParameter("accessLevel");
+				StringBuffer jb = new StringBuffer();
+				String line = null;
 
-				if (reciverId != null && userId != null && groupId != null && accessLevel != null) {
+				BufferedReader reader = request.getReader();
+				while ((line = reader.readLine()) != null)
+					jb.append(line);
 
-					if(reciverId.equals(userId)) {
-						
+				JSONObject jsonBody = new JSONObject(jb.toString());
+
+				try {
+					String reciverId = (String) jsonBody.get("reciverId");
+					String userId = (String) jsonBody.get("userId");
+					String groupId = (String) jsonBody.get("groupId");
+					String accessLevel = (String) jsonBody.get("accessLevel");
+
+					if (reciverId.equals(userId)) {
+
 						// Email and userId not found
 						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-						out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.sameUserRequest));
-					}
-					else {
-						
+						out.print(
+								ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.sameUserRequest));
+					} else {
+
 						Integer accesslevl = Integer.parseInt(accessLevel);
 
-						//Valid email
+						// Valid email
 						database.GroupInvite invite = new database.GroupInvite();
-						Pair<Integer, String> loginOutput = invite.createGroupInvite(userId, accesslevl, reciverId, groupId);
+						Pair<Integer, String> loginOutput = invite.createGroupInvite(userId, accesslevl, reciverId,
+								groupId);
 						response.setStatus(loginOutput.getKey());
 						out.print(loginOutput.getValue());
 					}
-					
 
-				} else {
+				} catch (JSONException e) {
 
-					// Email and userId not found
+					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.fieldsMissing));
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
+
 			} else {
 
 				// Not authorisation

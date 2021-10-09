@@ -1,5 +1,6 @@
 package apiendpoint;
 
+import java.io.BufferedReader;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
@@ -8,7 +9,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import constants.UserConstants;
+import database.FriendInvite;
 import database.User;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
@@ -39,41 +44,51 @@ public class Login extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 		// TODO Auto-generated method stub
 		// Analyze the servlet exception
+
 		try {
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 
-			String email = request.getParameter("email");
-			String password = request.getParameter("password");
+			StringBuffer jb = new StringBuffer();
+			String line = null;
 
-			//Check email and password is empty
-			if (email != null && password != null) {
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+
+			JSONObject jsonBody = new JSONObject(jb.toString());
+
+			try {
+
+				String email = (String) jsonBody.get("email");
+				String password = (String) jsonBody.get("password");
 
 				if (Helper.isEmailValid(email)) {
 
-					//Handle the login
+					// Handle the login
 					User user = new User();
 					Pair<Integer, String> loginOutput = user.login(email, password);
 					response.setStatus(loginOutput.getKey());
 					out.print(loginOutput.getValue());
 				} else {
 
-					//Email format validation fail
+					// Email format validation fail
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 					out.print(ApiResponseHandler.apiResponse(ResponseType.FAILURE, UserConstants.emailForatRequired));
 				}
-			} else {
 
-				//If the user name and password is empty user will get error message
+			} catch (JSONException e) {
+
+				// All the required data not found in the API body
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 			}
 
 			out.flush();
 		} catch (Exception e) {
-			
-			//Exception handlers
+
+			// Exception handlers
 			throw new ServletException(e);
 		}
 	}
