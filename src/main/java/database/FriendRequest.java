@@ -103,8 +103,22 @@ public class FriendRequest extends DatabaseConnector {
 							// Check user exist in the same friendRequest
 							if (acceptCheckUserExist(userId, friendRequestId)) {
 								
+								String accepterName = "";
+								String senderEmail = "";
+								ResultSet friends = getSingleFriendsData(friendRequestId);
 								// Accept friend request
-								return acceptRequest(friendRequestId);
+								if(friends.next()) {
+									String senderId = friends.getNString("senderUserId");
+									
+									JSONObject senderObject = user.getSingleUserDetails(senderId);
+									JSONObject receiver = user.getSingleUserDetails(userId);
+									
+									if(senderObject.get("email") != null && receiver.get("name") != null) {
+										accepterName = (String) receiver.get("name");
+										senderEmail = (String) senderObject.get("email");
+									}
+								}
+								return acceptRequest(friendRequestId, accepterName, senderEmail);
 							}
 							else {
 								
@@ -167,27 +181,39 @@ public class FriendRequest extends DatabaseConnector {
 	}
 	
 	
-	// user exist in the sender or receiver
-		private Boolean acceptCheckUserExist(String userId, String requestId) throws Exception {
+	// user exist in the receiver
+	private ResultSet getSingleFriendsData(String friendsId) throws Exception {
 
-			String selectStatement = "select * from friends where receiverUserId = ? AND friendsId=?;";
+		String selectStatement = "select * from friends where  friendsId=?;";
 
-			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
-			prepStmt.setString(1, userId);
-			prepStmt.setString(2, requestId);
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, friendsId);
 
-			ResultSet rs = prepStmt.executeQuery();
+		ResultSet rs = prepStmt.executeQuery();
+		return rs;
+	}
+	
+	// user exist in the receiver
+	private Boolean acceptCheckUserExist(String userId, String requestId) throws Exception {
 
-			if (rs.next()) {
+		String selectStatement = "select * from friends where receiverUserId = ? AND friendsId=?;";
 
-				prepStmt.close();
-				return true;
-			} else {
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, userId);
+		prepStmt.setString(2, requestId);
 
-				prepStmt.close();
-				return false;
-			}
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			prepStmt.close();
+			return true;
+		} else {
+
+			prepStmt.close();
+			return false;
 		}
+	}
 
 	public Pair<Integer, String> deleteFriendRequest(String userId, String friendRequestId) {
 		try {
@@ -501,7 +527,19 @@ public class FriendRequest extends DatabaseConnector {
 		int x = prepStmt.executeUpdate();
 
 		if (x == 1) {
-
+			
+			User user  = new User();
+			
+			JSONObject sender = user.getSingleUserDetails(userId);
+			JSONObject receiver  = user.getSingleUserDetails(friendId);
+			
+			if(sender.get("name") != null && receiver.get("email") != null) {
+				String senderName  = (String) sender.getString("name");
+				String reciverEmail = (String) receiver.getString("email");
+				Helper.sendMail(senderName + " send you friend request", "Friend Request", reciverEmail);
+			}
+			
+			
 			prepStmt.close();
 			remove();
 			// TODO: If required can send email
@@ -567,7 +605,7 @@ public class FriendRequest extends DatabaseConnector {
 	}
 
 	// Accept friends
-	private Pair<Integer, String> acceptRequest(String friendsId) {
+	private Pair<Integer, String> acceptRequest(String friendsId, String accepter, String senderEmail) {
 
 		try {
 			String sqlStatement = "update friends set updateDate = ?, isFriends = ? where friendsId = ?;";
@@ -585,7 +623,7 @@ public class FriendRequest extends DatabaseConnector {
 
 			if (x == 1) {
 
-				// TODO: Can send the mail if required
+				Helper.sendMail(accepter + " accepted your friend request", "Friend Request Accepted", senderEmail);
 				prepStmt.close();
 				remove();
 				return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,

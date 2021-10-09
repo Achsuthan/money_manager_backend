@@ -84,16 +84,23 @@ public class FriendInvite extends DatabaseConnector {
 			case 400: {
 
 				String lastId = getLastInvite();
+				
+				User user = new User();
+				String requestUserName = "";
+				JSONObject singleUser  = user.getSingleUserDetails(userId);
+				if(singleUser.get("name") != null) {
+					requestUserName = (String) singleUser.get("name");
+				}
 
 				if (!lastId.isEmpty()) {
 					
 					//First invite
-					Pair<Integer, String> res = addInvite(Helper.nextId(lastId, "INV"), userId, email);
+					Pair<Integer, String> res = addInvite(Helper.nextId(lastId, "INV"), userId, email, requestUserName);
 					remove();
 					return res;
 				} else {
 
-					Pair<Integer, String> res = addInvite(InviteConstants.firstInviteId, userId, email);
+					Pair<Integer, String> res = addInvite(InviteConstants.firstInviteId, userId, email, requestUserName);
 					remove();
 					return res;
 				}
@@ -402,7 +409,7 @@ public class FriendInvite extends DatabaseConnector {
 	}
 
 	//Create invite 
-	private Pair<Integer, String> addInvite(String inviteId, String userId, String email) {
+	private Pair<Integer, String> addInvite(String inviteId, String userId, String email, String requestUserName) {
 
 		try {
 
@@ -425,7 +432,6 @@ public class FriendInvite extends DatabaseConnector {
 			prepStmt.setTimestamp(6, ts);
 			prepStmt.setString(7, userId);
 
-			System.out.println("Testing 3");
 
 			int x = prepStmt.executeUpdate();
 
@@ -439,8 +445,10 @@ public class FriendInvite extends DatabaseConnector {
 
 					//Get single invite success
 					JSONObject obj = new JSONObject();
-					obj.put("Link", Helper.createInviteLink(singleInvite.getString("inviteId")));
-					//TODO: Can send email here to the user with content
+					String link = Helper.createInviteLink(singleInvite.getString("inviteId"));
+					obj.put("Link", link);
+					
+					Helper.sendMail(requestUserName + " send you the invitation link to join to Money Manger \nlink: "+ link,InviteConstants.registerSubject , email);
 					remove();
 					return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
 							InviteConstants.inviteCreatedSuccessfully, obj));

@@ -41,6 +41,8 @@ public class GroupInvite extends HttpServlet {
 			throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		try {
+			
+			System.out.println("envirment variable "+ System.getenv().get("PATH"));
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();

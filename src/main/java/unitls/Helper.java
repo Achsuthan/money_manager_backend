@@ -1,5 +1,11 @@
 package unitls;
 
+import java.io.IOException;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.activation.*;
+import java.util.Properties;
+
 public class Helper {
 
 	public static boolean isEmailValid(String email) {
@@ -22,8 +28,44 @@ public class Helper {
 		return inviteId;
 	}
 
-	public static Boolean sendMail() {
-		return true;
-	}
+	public static Boolean sendMail(String body, String subject ,String receiver) {
 
+		final String username = "";
+		final String password = "";
+		
+		if(receiver.isEmpty() || (username.isEmpty() && password.isEmpty())) {
+			return true;
+		}
+		
+		String host = "smtp.gmail.com";
+		Properties prop = new Properties();
+		prop.put("mail.smtp.auth", true);
+		prop.put("mail.smtp.starttls.enable", "true");
+		prop.put("mail.smtp.host", host);
+		prop.put("mail.smtp.port", 587);
+		prop.put("mail.smtp.ssl.trust", host);
+		prop.put("mail.smtp.ssl.protocols", "TLSv1.2");
+
+		Session session = Session.getInstance(prop, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(username, password);
+			}
+		});
+
+		try {
+
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress("noreply@moneymanager.com"));
+			message.setRecipients(Message.RecipientType.TO,
+					InternetAddress.parse(receiver));
+			message.setSubject(subject);
+			message.setText(body);
+
+			Transport.send(message);
+			return true;
+
+		} catch (MessagingException e) {
+			return false;
+		}
+	}
 }

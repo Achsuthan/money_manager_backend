@@ -20,104 +20,101 @@ public class Group extends DatabaseConnector {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-	//Create group
+
+	// Create group
 	public Pair<Integer, String> createGroup(String userId, String groupName) {
-		
+
 		try {
-			
-			//Check user
+
+			// Check user
 			User user = new User();
-			if(user.CheckUserExist(userId)) {
-				
-				//Last group Id
+			if (user.CheckUserExist(userId)) {
+
+				// Last group Id
 				String lastId = getLastGroupId();
-				if(!lastId.isEmpty()) {
-					
+				if (!lastId.isEmpty()) {
+
 					lastId = Helper.nextId(lastId, "GRP");
-					System.out.println("last id"+ lastId);
+					System.out.println("last id" + lastId);
 					return addGroupInfo(lastId, groupName, userId);
+				} else {
+
+					// First group creation
+					return addGroupInfo(GroupConstraints.firstGroupId, groupName, userId);
+
 				}
-				else {
-					
-					//First group creation
-					return addGroupInfo(GroupConstraints.firstGroupId, groupName, userId); 
-						
-					
-				}
-			}
-			else {
-				
+			} else {
+
 				remove();
-	            return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.userNotFound));
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.userNotFound));
 			}
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			System.out.println("error errror" + e);
 			remove();
-            return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
 	}
-	
-	//Get all the groups 
+
+	// Get all the groups
 	public Pair<Integer, String> getAllGroup(String userId) {
-		
+
 		try {
-			
-			//Check user
+
+			// Check user
 			User user = new User();
-			if(user.CheckUserExist(userId)) {
-				
+			if (user.CheckUserExist(userId)) {
+
 				ResultSet accessLevel = getAllAccessLevelBasedOnUser(userId);
-				
+
 				JSONArray groupArray = new JSONArray();
-				while(accessLevel.next()) {
-					
+				while (accessLevel.next()) {
+
 					Boolean isAccepted = accessLevel.getBoolean("isAccepted");
-					if(isAccepted) {
-						
+					if (isAccepted) {
+
 						String groupId = accessLevel.getString("groupId");
 						ResultSet groupInfo = getGroupInfoBasedOnID(groupId);
-						
-						if(groupInfo.next()) {
-							String groupName = groupInfo.getString("name"); 
+
+						if (groupInfo.next()) {
+							String groupName = groupInfo.getString("name");
 							String groupUserId = groupInfo.getString("createrId");
-							
+
 							JSONObject singleGroup = new JSONObject();
 							singleGroup.put("groupId", groupId);
 							singleGroup.put("groupName", groupName);
 							singleGroup.put("isOwner", false);
-							if(userId.equals(groupUserId)) {
+							if (userId.equals(groupUserId)) {
 								singleGroup.put("isOwner", true);
 							}
-							
+
 							groupArray.put(singleGroup);
 						}
 					}
 				}
-				//TODO: Need to get the transactions details here
+				// TODO: Need to get the transactions details here
 				JSONObject retunOBject = new JSONObject();
 				retunOBject.put("group", groupArray);
 				remove();
-				return new Pair<Integer, String>(200 , ApiResponseHandler.apiResponse(ResponseType.SUCCESS, SearchConstraints.success, retunOBject));
-				
-			}
-			else {
-				
+				return new Pair<Integer, String>(200,
+						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, SearchConstraints.success, retunOBject));
+
+			} else {
+
 				remove();
-	            return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.userNotFound));
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.userNotFound));
 			}
-		}
-		catch(Exception e) {
-			
+		} catch (Exception e) {
+
 			System.out.println("error errror" + e);
 			remove();
-            return new Pair<Integer, String>(500 ,ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
 	}
-	
-	//Get the last group Id
-	private String getLastGroupId() throws Exception{
+
+	// Get the last group Id
+	private String getLastGroupId() throws Exception {
 
 		String selectStatement = "select groupId from spending_group ORDER BY groupId DESC LIMIT 1;";
 
@@ -134,8 +131,20 @@ public class Group extends DatabaseConnector {
 			return "";
 		}
 	}
-	
-	
+
+	// Get singleGroup
+	public ResultSet getsingleGroup(String groupId) throws Exception {
+
+		String selectStatement = "select * from spending_group where groupId=?;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setNString(1, groupId);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		return rs;
+	}
+
 	// Get all Access Level based on the user
 	private ResultSet getGroupInfoBasedOnID(String groupId) throws Exception {
 
@@ -147,7 +156,7 @@ public class Group extends DatabaseConnector {
 
 		return rs;
 	}
-	
+
 	// Check user already exist in the access level
 	public Boolean checkUserAlreadyHaveAccessToSameGroup(String userId, String groupId) throws Exception {
 
@@ -159,15 +168,15 @@ public class Group extends DatabaseConnector {
 		prepStmt.setBoolean(3, true);
 		ResultSet rs = prepStmt.executeQuery();
 
-		if(rs.next()) {
-			
+		if (rs.next()) {
+
 			prepStmt.close();
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	// Get all Access Level based on the user
 	private ResultSet getAllAccessLevelBasedOnUser(String userId) throws Exception {
 
@@ -179,9 +188,9 @@ public class Group extends DatabaseConnector {
 
 		return rs;
 	}
-	
-	//Get Last Access Level Id
-	private String getLastAccessLevel() throws Exception{
+
+	// Get Last Access Level Id
+	private String getLastAccessLevel() throws Exception {
 
 		String selectStatement = "select accessLevelId from access_level ORDER BY accessLevelId DESC LIMIT 1;";
 
@@ -198,9 +207,9 @@ public class Group extends DatabaseConnector {
 			return "";
 		}
 	}
-	
+
 	public Boolean checkOwerner(String userId, String groupId) throws Exception {
-		
+
 		String selectStatement = "select * from access_level where groupId = ? AND userId=? AND level=?;";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
@@ -215,8 +224,7 @@ public class Group extends DatabaseConnector {
 			return false;
 		}
 	}
-	
-	
+
 	// Group check
 	public Boolean checkGroupExist(String groupId) throws Exception {
 
@@ -232,10 +240,10 @@ public class Group extends DatabaseConnector {
 			return false;
 		}
 	}
-	
-	//Create group
+
+	// Create group
 	private Pair<Integer, String> addGroupInfo(String groupId, String groupName, String userId) throws Exception {
-		
+
 		String sqlStatement = "insert into spending_group(groupId, name, createdDate, updatedDate, isDeleted, createrId) values (?, ?, ? ,? ,?, ?);";
 
 		Calendar cal = Calendar.getInstance();
@@ -253,30 +261,31 @@ public class Group extends DatabaseConnector {
 		int x = prepStmt.executeUpdate();
 
 		if (x == 1) {
-			
+
 			prepStmt.close();
 			return createAccessLevel(userId, groupId, 0, true);
 		} else {
-			
+
 			prepStmt.close();
 			remove();
-            return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.failed));
+			return new Pair<Integer, String>(400,
+					ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.failed));
 		}
-		
+
 	}
-	
-	//Create access level
-	public Pair<Integer, String> createAccessLevel(String userId, String groupId, Integer accessLevel, Boolean isAccepted) throws Exception {
-		
-		//Last Access Level Id
+
+	// Create access level
+	public Pair<Integer, String> createAccessLevel(String userId, String groupId, Integer accessLevel,
+			Boolean isAccepted) throws Exception {
+
+		// Last Access Level Id
 		String accessLevelId = getLastAccessLevel();
-		if(accessLevelId.isEmpty()) {
+		if (accessLevelId.isEmpty()) {
 			accessLevelId = GroupConstraints.firstAccessLevelId;
-		}
-		else {
+		} else {
 			accessLevelId = Helper.nextId(accessLevelId, "GAL");
 		}
-		
+
 		String sqlStatement = "insert into access_level(accessLevelId, level, isAccepted, isDeleted ,createdDate, updatedDate, groupId, userId) values (?, ?, ? ,? ,?, ?, ?, ?);";
 
 		Calendar cal = Calendar.getInstance();
@@ -298,15 +307,17 @@ public class Group extends DatabaseConnector {
 		int x = prepStmt.executeUpdate();
 
 		if (x == 1) {
-			//Success
+			// Success
 			prepStmt.close();
 			remove();
-            return new Pair<Integer, String>(200 ,ApiResponseHandler.apiResponse(ResponseType.SUCCESS, GroupConstraints.success));
+			return new Pair<Integer, String>(200,
+					ApiResponseHandler.apiResponse(ResponseType.SUCCESS, GroupConstraints.success));
 		} else {
-			//Failure
+			// Failure
 			prepStmt.close();
 			remove();
-            return new Pair<Integer, String>(400 ,ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.failed));
+			return new Pair<Integer, String>(400,
+					ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.failed));
 		}
 	}
 

@@ -379,9 +379,35 @@ public class GroupInvite extends DatabaseConnector {
 
 				if (singleInvite.next()) {
 
-					// TODO: Can send the email here
 					JSONObject obj = new JSONObject();
-					obj.put("Link", Helper.createInviteLink(singleInvite.getString("groupInviteId")));
+					String link =  Helper.createInviteLink(singleInvite.getString("groupInviteId"));
+					obj.put("Link",link);
+					
+					// TODO: Can send the email here
+					User user = new User();
+					Group group = new Group();
+					ResultSet singleGroup = group.getsingleGroup(groupId);
+					String groupName = "";
+					if(singleGroup.next()) {
+						groupName = singleGroup.getNString("name");
+					}
+					
+					JSONObject senderUser = user.getSingleUserDetails(userId);
+					JSONObject receiverUser = user.getSingleUserDetails(receiverUserId);
+					
+					String senderUsername = "";
+					String receiverEmail = "";
+					
+					
+					if(senderUser.get("name") != null && receiverUser.get("email") != null) {
+						
+						senderUsername = (String) senderUser.get("name");
+						receiverEmail = (String) receiverUser.get("email");
+					}
+					
+					Helper.sendMail(senderUsername + " invite you to the " + groupName +" Group"+ "\n By clicking the link you can join to the group link: " + link, "Group Invite", receiverEmail);
+					
+					
 					remove();
 					return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
 							InviteConstants.inviteCreatedSuccessfully, obj));

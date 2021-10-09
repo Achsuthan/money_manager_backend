@@ -41,7 +41,6 @@ public class AcceptGroupInvite extends HttpServlet {
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();
 
-			Helper.sendMail();
 			// Handle the session
 			if (TokenHanler.checkToken()) {
 

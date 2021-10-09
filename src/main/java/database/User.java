@@ -238,7 +238,7 @@ public class User extends DatabaseConnector {
 		int x = prepStmt.executeUpdate();
 
 		if (x == 1) {
-
+			Helper.sendMail(UserConstants.registerBody,UserConstants.registerSubject , email);
 			prepStmt.close();
 			return new Pair<Integer, String>(200,
 					ApiResponseHandler.apiResponse(ResponseType.SUCCESS, UserConstants.userRegisterSuccessfully));

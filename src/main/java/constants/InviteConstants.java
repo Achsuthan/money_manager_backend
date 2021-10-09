@@ -31,5 +31,9 @@ public class InviteConstants {
 	public static String linkExpired = "Invite link Expired";
 	public static String deleteGroupInviteFailed = "Delete group invite failed please try again later";
 	
+	
+	//mail 
+	public static String registerSubject = "Invitation to MoneyManager";
+	
 
 }

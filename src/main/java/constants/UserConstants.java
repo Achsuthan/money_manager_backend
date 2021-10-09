@@ -21,4 +21,8 @@ public class UserConstants {
 	public static String userNotFound = "User not found in the system";
 	public static String requestedUserNotFound = "Requesting friend is not found";
 	
+	//Mail 
+	public static String registerBody = "You have successfuly registered to MoneyManger";
+	public static String registerSubject = "Registered successfuly";
+	
 }
