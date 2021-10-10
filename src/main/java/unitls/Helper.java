@@ -3,6 +3,9 @@ package unitls;
 import java.io.IOException;
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import constants.TransactionConstrains;
+
 import javax.activation.*;
 import java.util.Properties;
 
@@ -28,15 +31,40 @@ public class Helper {
 		return inviteId;
 	}
 
-	public static Boolean sendMail(String body, String subject ,String receiver) {
-
-		final String username = "";
-		final String password = "";
-		
-		if(receiver.isEmpty() || (username.isEmpty() && password.isEmpty())) {
+	// Validate the transaction to
+	public static Boolean validteTransactionTo(String transactionTo) {
+		String upperTransactionTo = transactionTo.toUpperCase();
+		if( upperTransactionTo.equals(TransactionConstrains.personal) || 
+				upperTransactionTo.equals(TransactionConstrains.group) || 
+				upperTransactionTo.equals(TransactionConstrains.friend)) {
 			return true;
 		}
 		
+		return false;
+	}
+
+	// Validate the transaction to
+	public static Boolean validteTransactionType(String transactionType) {
+		String transactionTypeUperCase = transactionType.toUpperCase();
+		if(transactionTypeUperCase.equals(TransactionConstrains.expenses) || 
+				transactionTypeUperCase.equals(TransactionConstrains.income) || 
+				transactionTypeUperCase.endsWith(TransactionConstrains.transfer)) {
+			return true;
+		}
+		
+		return false;
+	}
+
+	// Send mail using g-mail
+	public static Boolean sendMail(String body, String subject, String receiver) {
+
+		final String username = "";
+		final String password = "";
+
+		if (receiver.isEmpty() || (username.isEmpty() && password.isEmpty())) {
+			return true;
+		}
+
 		String host = "smtp.gmail.com";
 		Properties prop = new Properties();
 		prop.put("mail.smtp.auth", true);
@@ -56,8 +84,7 @@ public class Helper {
 
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress("noreply@moneymanager.com"));
-			message.setRecipients(Message.RecipientType.TO,
-					InternetAddress.parse(receiver));
+			message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver));
 			message.setSubject(subject);
 			message.setText(body);
 
