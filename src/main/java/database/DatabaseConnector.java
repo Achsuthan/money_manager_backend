@@ -24,6 +24,8 @@ public class DatabaseConnector {
             */
             Class.forName(dbdriver);
             con = DriverManager.getConnection(url, username, password);
+            //For the testing purpose can enable this
+//            con = DriverManager.getConnection("jdbc:mysql://sql6.freemysqlhosting.net:3306/sql6444684", "sql6444684", "T9jqBmjlG1");
             System.out.println("Database connected successfully");
             
         } catch (Exception ex) {
