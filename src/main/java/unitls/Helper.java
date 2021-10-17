@@ -1,12 +1,10 @@
 package unitls;
 
-import java.io.IOException;
 import javax.mail.*;
 import javax.mail.internet.*;
 
 import constants.TransactionConstrains;
 
-import javax.activation.*;
 import java.util.Properties;
 
 public class Helper {
