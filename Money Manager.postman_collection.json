@@ -62,11 +62,8 @@
 				},
 				{
 					"name": "Register with Accept Invite",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -100,8 +97,8 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "urlencoded",
-							"urlencoded": [],
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"2@1.com\",\n    \"userId\": \"USR-11111111\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -459,6 +456,63 @@
 									"key": "userId",
 									"value": "USR-11111111"
 								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transction",
+			"item": [
+				{
+					"name": "Create Own Transction",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"personal\",\n    \"transactionType\": \"transfer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Friends Transaction",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111112\",\n            \"persentage\": 80.0\n        },\n        {\n            \"friendId\": \"USR-11111112\",\n            \"persentage\": 20.0\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction"
 							]
 						}
 					},
