@@ -98,7 +98,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"2@1.com\",\n    \"userId\": \"USR-11111111\"\n}",
+							"raw": "{\n    \"email\": \"achsuthancopy1994@gmail.com\",\n    \"userId\": \"USR-11111111\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -154,7 +154,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/friend-invite?userId=USR-11111113",
+							"raw": "{{baseUrl}}/friend-invite?userId=USR-11111111",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -164,7 +164,7 @@
 							"query": [
 								{
 									"key": "userId",
-									"value": "USR-11111113"
+									"value": "USR-11111111"
 								}
 							]
 						}
@@ -388,7 +388,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"groupInviteId\": \"GIV-11111111\"\n}",
+							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"groupInviteId\": \"GIV-11111111\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -499,7 +499,33 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111112\",\n            \"persentage\": 80.0\n        },\n        {\n            \"friendId\": \"USR-11111112\",\n            \"persentage\": 20.0\n        }\n    ]\n}",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111112\",\n            \"persentage\": 30.0\n        },\n        {\n            \"friendId\": \"USR-11111112\",\n            \"persentage\": 50.0\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Group Transaction",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"group\",\n    \"transactionType\": \"transfer\",\n    \"groupId\": \"GRP-11111111\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 80.0\n        },\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 20.0\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
