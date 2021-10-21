@@ -36,7 +36,7 @@ public class FriendInvite extends DatabaseConnector {
 					
 					remove();
 					return new Pair<Integer, String>(400,
-							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userEmailNotExist));
+							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userExistForInvite));
 				} else {
 					return handleCreateInviteLink(email, userId);
 				}
@@ -59,7 +59,6 @@ public class FriendInvite extends DatabaseConnector {
 		try {
 
 			Pair<Integer, String> emailStatus = getInviteLink(email);
-			System.out.println("status " + emailStatus.getKey());
 
 			switch (emailStatus.getKey()) {
 			
@@ -215,7 +214,7 @@ public class FriendInvite extends DatabaseConnector {
 					JSONObject singleInvite = new JSONObject();
 					singleInvite.put("inviteId", rs.getString("inviteId"));
 					singleInvite.put("email", rs.getString("email"));
-					singleInvite.put("ling", Helper.createInviteLink(rs.getString("inviteId")));
+					singleInvite.put("link", Helper.createInviteLink(rs.getString("inviteId")));
 					invitesArray.put(singleInvite);
 				}
 				
