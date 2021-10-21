@@ -21,6 +21,7 @@ import com.sun.jdi.connect.Transport;
 
 import constants.TransactionConstrains;
 import constants.UserConstants;
+import database.GroupTransaction;
 import database.SharedTransaction;
 import database.SingleTransaction;
 import database.User;
@@ -93,7 +94,7 @@ public class Transaction extends HttpServlet {
 				}
 				
 				if(Helper.validteTransactionTo(transactionTo)) {
-					
+					//Own
 					if(Helper.validteTransactionType(transactionType)) {
 						
 						String transactionToUpperCase = transactionTo.toUpperCase();
@@ -115,10 +116,9 @@ public class Transaction extends HttpServlet {
 						}
 						else if(transactionToUpperCase.equals(TransactionConstrains.friend)) {
 							
-							System.out.println("Friend");
+							//Friends
 							try {
 								JSONArray friendsDetails = jsonBody.getJSONArray("friends");
-								System.out.println("Friends" + friendsDetails);
 								
 								if(!transactionType.toUpperCase().equals(TransactionConstrains.transfer)) {
 									// All the required data not found in the API body
@@ -141,8 +141,29 @@ public class Transaction extends HttpServlet {
 							}
 						}
 						else {
-							
-							System.out.println("Group");
+							//Group
+							try {
+								JSONArray friendsDetails = jsonBody.getJSONArray("friends");
+								String groupId = (String) jsonBody.get("groupId");
+								
+								if(!transactionType.toUpperCase().equals(TransactionConstrains.transfer)) {
+									// All the required data not found in the API body
+									response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+									out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING, TransactionConstrains.transactionTypeValidationError));
+								}
+								else {
+									GroupTransaction transaction = new GroupTransaction();
+									Pair<Integer, String> obj = transaction.handleGroupTransaction(userId, groupId ,friendsDetails, name, amount, description, javaDate, transactionTo, transactionType, categoryId);
+									response.setStatus(obj.getKey());
+									out.print(obj.getValue());
+								}
+							}
+							catch (JSONException e) {
+
+								// All the required data not found in the API body
+								response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+								out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+							}
 						}
 					}
 					else {

@@ -58,7 +58,7 @@ public class SharedTransaction extends DatabaseConnector {
 					else if (isOwn) {
 						
 						remove();
-						return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+						return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.DATAMISSING, TransactionConstrains.noOwnTransaction));
 					}
 					else if (!isFriends) {
 						
@@ -78,10 +78,12 @@ public class SharedTransaction extends DatabaseConnector {
 					}
 				} catch (JSONException e) {
 
+					System.out.println("Error error "+ e);
 					remove();
 					return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				} catch (ClassCastException ee) {
 
+					System.out.println("Error error 2"+ ee);
 					remove();
 					return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 				}
@@ -116,37 +118,7 @@ public class SharedTransaction extends DatabaseConnector {
 			String transactionId = (String) ((JSONObject) transactionObject.get("body")).getString("transactionId");
 			
 			for (int i = 0; i < friendsArray.length(); i++) {
-				
-				String sharedTransactionId = getLastTransactionId();
-				if(sharedTransactionId.equals("")) {
-					
-					sharedTransactionId = TransactionConstrains.firstSharedTransactionId;
-				}
-				else {
-					sharedTransactionId = Helper.nextId(sharedTransactionId, "SHT");
-				}
-				
-				JSONObject singleFriend = friendsArray.getJSONObject(i);
-				
-				String friendId = singleFriend.getString("friendId");
-				
-				String sqlStatement = "insert into shared_transaction(sharedTransactionId, persentage, createdDate, updatedDate, transactionId, sennderUserId, receiverUserId) values (?, ?, ? ,? ,?, ?, ?);";
-
-				Calendar cal = Calendar.getInstance();
-				long timeNow = cal.getTimeInMillis();
-				java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
-
-				PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
-				prepStmt.setString(1, sharedTransactionId);
-				prepStmt.setDouble(2, singleFriend.getDouble("persentage"));
-				prepStmt.setTimestamp(3, ts);
-				prepStmt.setTimestamp(4, ts);
-				prepStmt.setString(5, transactionId);
-				prepStmt.setString(6, userId);
-				prepStmt.setString(7, friendId);
-				
-				int x = prepStmt.executeUpdate();
-
+				addSingleSharedTransaction(friendsArray.getJSONObject(i), transactionId, userId, transactionName, amount, description, date, transacionTo, transactionType, categoryId);
 			}
 			
 			remove();
@@ -156,6 +128,40 @@ public class SharedTransaction extends DatabaseConnector {
 		else {
 			return result;
 		}
+	}
+	
+	public String addSingleSharedTransaction(JSONObject singleFriend, String transactionId ,String userId,  String transactionName, Double amount, String description, Date date, String transacionTo, String transactionType, String categoryId) throws Exception {
+		
+		String sharedTransactionId = getLastTransactionId();
+		if(sharedTransactionId.equals("")) {
+			
+			sharedTransactionId = TransactionConstrains.firstSharedTransactionId;
+		}
+		else {
+			sharedTransactionId = Helper.nextId(sharedTransactionId, "SHT");
+		}
+		
+		String friendId = singleFriend.getString("friendId");
+		
+		String sqlStatement = "insert into shared_transaction(sharedTransactionId, persentage, createdDate, updatedDate, transactionId, sennderUserId, receiverUserId) values (?, ?, ? ,? ,?, ?, ?);";
+
+		Calendar cal = Calendar.getInstance();
+		long timeNow = cal.getTimeInMillis();
+		java.sql.Timestamp ts = new java.sql.Timestamp(timeNow);
+
+		PreparedStatement prepStmt = con.prepareStatement(sqlStatement);
+		prepStmt.setString(1, sharedTransactionId);
+		prepStmt.setDouble(2, singleFriend.getDouble("persentage"));
+		prepStmt.setTimestamp(3, ts);
+		prepStmt.setTimestamp(4, ts);
+		prepStmt.setString(5, transactionId);
+		prepStmt.setString(6, userId);
+		prepStmt.setString(7, friendId);
+		
+		int x = prepStmt.executeUpdate();
+		prepStmt.close();
+		return sharedTransactionId;
+		
 	}
 
 	// Get Last transaction based on ID

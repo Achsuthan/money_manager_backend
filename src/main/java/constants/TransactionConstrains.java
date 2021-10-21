@@ -13,6 +13,7 @@ public class TransactionConstrains {
 	
 	public static String firstTransactionId = "TRA-11111111";
 	public static String firstSharedTransactionId = "SHT-11111111";
+	public static String firstGroupTransactionId = "GRT-11111111";
 	
 	//Success
 	public static String transactionCreatedSuccessfuly = "Transaction created successfully";
@@ -24,5 +25,7 @@ public class TransactionConstrains {
 	public static String transactionAmountCannotbeZero = "Transaction amount should be greater than zero";
 	public static String splitPersentageWrong = "Something wrong with the split persentage please have a look";
 	public static String notFriends = "You are not friends with one or more shared users";
+	public static String noOwnTransaction = "You don't need to input your transaction";
+	public static String oneOrMoreUserNotInGroup = "One or more friends in the group";
 
 }
