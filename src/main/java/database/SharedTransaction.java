@@ -199,8 +199,6 @@ public class SharedTransaction extends DatabaseConnector {
 		prepStmt.setNString(3, userId);
 
 		ResultSet rs = prepStmt.executeQuery();
-
-		JSONObject transactionObject = new JSONObject();
 		
 		models.SharedTransaction sharedTransaction = new models.SharedTransaction();
 		
