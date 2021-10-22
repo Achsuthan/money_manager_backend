@@ -473,7 +473,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"personal\",\n    \"transactionType\": \"transfer\"\n}",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"personal\",\n    \"transactionType\": \"expenses\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -499,7 +499,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111112\",\n            \"persentage\": 30.0\n        },\n        {\n            \"friendId\": \"USR-11111112\",\n            \"persentage\": 50.0\n        }\n    ]\n}",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 100.0,\n    \"date\": \"2021-10-20\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 90.0\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -526,6 +526,93 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"group\",\n    \"transactionType\": \"transfer\",\n    \"groupId\": \"GRP-11111111\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 80.0\n        },\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 20.0\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Own Transactions",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"personal\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Friends Transactions",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"friend\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/transaction",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"transaction"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Group Transactions",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"group\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
