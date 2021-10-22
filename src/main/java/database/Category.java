@@ -3,6 +3,8 @@ package database;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import org.json.JSONObject;
+
 public class Category extends DatabaseConnector {
 
 	public Category() throws Exception {

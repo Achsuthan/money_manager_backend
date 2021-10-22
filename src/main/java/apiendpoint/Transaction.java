@@ -50,7 +50,82 @@ public class Transaction extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		try {
+			response.setContentType("application/json");
+			response.setCharacterEncoding("utf-8");
+			PrintWriter out = response.getWriter();
+
+			StringBuffer jb = new StringBuffer();
+			String line = null;
+
+			BufferedReader reader = request.getReader();
+			while ((line = reader.readLine()) != null)
+				jb.append(line);
+
+			JSONObject jsonBody = new JSONObject(jb.toString());
+
+			try {
+				
+				String transactionTo = (String) jsonBody.get("transactionTo");
+				String userId =  (String) jsonBody.get("userId"); 
+				
+				
+				if(Helper.validteTransactionTo(transactionTo)) {
+					
+					String transactionToUpperCase = transactionTo.toUpperCase();
+					
+					if(transactionToUpperCase.equals(TransactionConstrains.personal)) {
+						//Own Transaction
+						
+						SingleTransaction transaction = new SingleTransaction();
+						Pair<Integer, String> obj = transaction.getOwnTransaction(userId, transactionTo.toLowerCase());
+						response.setStatus(obj.getKey());
+						out.print(obj.getValue());
+						
+					}
+					else if(transactionToUpperCase.equals(TransactionConstrains.friend)) {
+						//Friends
+						
+						SharedTransaction transaction = new SharedTransaction();						
+						Pair<Integer, String> obj = transaction.getAllSharedTransactions(userId);
+						response.setStatus(obj.getKey());
+						out.print(obj.getValue());
+					}
+					else {
+						//Group
+						GroupTransaction transaction = new GroupTransaction();						
+						Pair<Integer, String> obj = transaction.getAllGroupTransactions(userId);
+						response.setStatus(obj.getKey());
+						out.print(obj.getValue());
+					}
+				}
+				else {
+					
+					// All the required data not found in the API body
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING, TransactionConstrains.transactionToValidationError));
+				}
+				
+
+			} catch (JSONException e) {
+
+				// All the required data not found in the API body
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+			}
+			catch (ClassCastException ee) {
+				
+				// All the required data not found in the API body
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+			}
+
+			out.flush();
+		} catch (Exception e) {
+
+			// Exception handlers
+			throw new ServletException(e);
+		}
 	}
 
 	/**
@@ -101,18 +176,26 @@ public class Transaction extends HttpServlet {
 						if(transactionToUpperCase.equals(TransactionConstrains.personal)) {
 							//Own Transaction
 							
-							if(amount > 0 ) {
-								SingleTransaction transaciton = new SingleTransaction();
-								Pair<Integer, String> obj = transaciton.createTransaction(userId, name, amount, description, javaDate, transactionTo, transactionType, categoryId);
-								response.setStatus(obj.getKey());
-								out.print(obj.getValue());
-							}
-							else {
-								
+							if(transactionType.toUpperCase().equals(TransactionConstrains.transfer)) {
 								// All the required data not found in the API body
 								response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-								out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING, TransactionConstrains.transactionAmountCannotbeZero));
+								out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING, TransactionConstrains.transactionTypeValidationError));
+							}else {
+								
+								if(amount > 0 ) {
+									SingleTransaction transaciton = new SingleTransaction();
+									Pair<Integer, String> obj = transaciton.createTransaction(userId, name, amount, description, javaDate, transactionTo, transactionType, categoryId);
+									response.setStatus(obj.getKey());
+									out.print(obj.getValue());
+								}
+								else {
+									
+									// All the required data not found in the API body
+									response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+									out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING, TransactionConstrains.transactionAmountCannotbeZero));
+								}
 							}
+							
 						}
 						else if(transactionToUpperCase.equals(TransactionConstrains.friend)) {
 							

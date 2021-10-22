@@ -11,6 +11,8 @@ import org.json.JSONObject;
 
 import constants.GroupConstraints;
 import constants.TransactionConstrains;
+import models.Category;
+import models.Transaction;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
 import unitls.Pair;
@@ -179,22 +181,83 @@ public class GroupTransaction extends DatabaseConnector {
 	}
 	
 	// Get Last transaction based on ID
-		private String getLastTransactionId() throws Exception {
+	private String getLastTransactionId() throws Exception {
 
-			String selectStatement = "select groupTransactionId from group_transaction ORDER BY groupTransactionId DESC LIMIT 1;";
+		String selectStatement = "select groupTransactionId from group_transaction ORDER BY groupTransactionId DESC LIMIT 1;";
 
-			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 
-			ResultSet rs = prepStmt.executeQuery();
+		ResultSet rs = prepStmt.executeQuery();
 
-			if (rs.next()) {
+		if (rs.next()) {
 
-				String transactionId = rs.getString("groupTransactionId");
-				prepStmt.close();
-				return transactionId;
-			} else {
-				return "";
-			}
+			String transactionId = rs.getString("groupTransactionId");
+			prepStmt.close();
+			return transactionId;
+		} else {
+			return "";
 		}
+	}
+	
+public Pair<Integer, String> getAllGroupTransactions(String userId) throws Exception {
+		
+		System.out.println(userId);
+		
+		String selectStatement = "select transaction.transactionId as transactionId, transaction.name as transactionName, transaction.description, transaction.amount, transaction.date, transaction.categoryId, transaction.userId as senderId, transaction.transactionTo, transaction.transactionType, shared_transaction.persentage, shared_transaction.receiverUserId as userId, shared_transaction.sennderUserId as senderUserId, user.email, user.name as userName, category.categoryName, category.imageName, category.color, spending_group.name as groupName, spending_group.groupId from transaction inner join shared_transaction on (shared_transaction.transactionId = transaction.transactionId AND (shared_transaction.sennderUserId=? || shared_transaction.receiverUserId=?)AND transaction.transactionTo='group') inner join group_transaction on (shared_transaction.sharedTransactionId = group_transaction.sharedTransactionId) inner join spending_group on (spending_group.groupId = group_transaction.groupId) inner join category on(category.categoryId = transaction.categoryId) inner join user on(user.userId = if (shared_transaction.receiverUserId = ?, shared_transaction.sennderUserId, shared_transaction.receiverUserId)) order by transaction.date desc;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setNString(1, userId);
+		prepStmt.setNString(2, userId);
+		prepStmt.setNString(3, userId);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		JSONObject transactionObject = new JSONObject();
+		
+		models.SharedTransaction sharedTransaction = new models.SharedTransaction();
+		
+		while (rs.next()) {
+			Double persentage = rs.getDouble("persentage");
+			Double amount = rs.getDouble("amount");
+			String senderId = rs.getString("senderUserId");
+			amount = amount < 0 ? -1 * amount : amount;
+			
+			models.User friend = new models.User();
+			friend.setUserId(senderId.equals(userId) ? rs.getString("userId"): senderId);
+			friend.setEmail(rs.getString("email"));
+			friend.setName(rs.getString("userName"));
+			friend.setPersentage(persentage);
+			friend.setAmount(persentage * amount/ 100);
+			
+			Category cat = new Category();
+			cat.setCategoryId(rs.getString("categoryId"));
+			cat.setCategoryName(rs.getString("categoryName"));
+			cat.setColor(rs.getString("color"));
+			cat.setImageName(rs.getString("imageName"));
+			
+			models.Group grp = new models.Group();
+			grp.setGroupId(rs.getString("groupId"));
+			grp.setGroupName(rs.getString("groupName"));
+			
+			Transaction trans = new Transaction();
+			trans.setCategory(cat);
+			
+			trans.setAmount(amount);
+			trans.setDate(rs.getDate("date"));
+			trans.setDescription(rs.getString("description"));
+			trans.setIsOwn(senderId.equals(userId) ? true : false);
+			trans.setTransactionId(rs.getString("transactionId"));
+			trans.setTransactionName(rs.getNString("transactionName"));
+			trans.setGroup(grp);
+			
+			
+			sharedTransaction.addTransaction(trans, friend);
+		}
+		
+		JSONObject obj = new JSONObject();
+		obj.put("transactions", sharedTransaction.getSharedTransactionObject());
+		return new Pair<Integer, String>(200,
+				ApiResponseHandler.apiResponse(ResponseType.SUCCESS, TransactionConstrains.transactionCreatedSuccessfuly, obj));
+	}
 
 }

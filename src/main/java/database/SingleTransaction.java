@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import constants.GroupConstraints;
@@ -37,6 +38,34 @@ public class SingleTransaction extends DatabaseConnector {
 					return new Pair<Integer, String>(400,
 							ApiResponseHandler.apiResponse(ResponseType.FAILURE, TransactionConstrains.categoryNotExist));
 				}
+				
+			}else {
+				
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.userNotFound));
+			}
+		}
+		catch (Exception e) {
+			
+			System.out.println("error errror" + e);
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+	
+	public Pair<Integer, String> getOwnTransaction(String userId, String transactionType) {
+		try {
+			
+			User user = new User();
+			if(user.CheckUserExist(userId)) {
+				
+				JSONArray transactionArray = getAllOwnTransaction(userId, transactionType);
+				JSONObject obj = new JSONObject();
+				obj.put("transactions", transactionArray);
+				remove();
+				return new Pair<Integer, String>(200,
+						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
 				
 			}else {
 				
@@ -189,6 +218,42 @@ public class SingleTransaction extends DatabaseConnector {
 		ResultSet rs = prepStmt.executeQuery();
 		
 		return rs;
+	}
+	
+	private JSONArray getAllOwnTransaction(String userId, String type) throws Exception {
+		
+		String selectStatement = "select * from transaction inner join category on(category.categoryId = transaction.categoryId) where transaction.userId= ? AND transaction.transactionTo=? order by transaction.date DESC;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setNString(1, userId);
+		prepStmt.setString(2, type);
+
+		ResultSet rs = prepStmt.executeQuery();
+		JSONArray returnResult = new JSONArray();
+		
+		while(rs.next()) {
+			JSONObject obj = new JSONObject();
+			obj.put("transactionId", rs.getString("transactionId"));
+			obj.put("transactionName", rs.getString("name"));
+			obj.put("description", rs.getString("description"));
+			obj.put("date", rs.getDate("date"));
+			obj.put("transactionTo", rs.getString("transactionTo"));
+			obj.put("transactionType", rs.getString("transactionType"));
+			obj.put("amount", rs.getDouble("amount") < 0 ? -1 * rs.getDouble("amount") : rs.getDouble("amount"));
+			obj.put("isOwn", true);
+			
+			JSONObject cat = new JSONObject();
+			cat.put("categoryId", rs.getString("categoryId"));
+			cat.put("categoryName", rs.getString("categoryName"));
+			cat.put("imageName", rs.getString("imageName"));
+			cat.put("color", rs.getString("color"));
+			
+			obj.put("category", cat);
+			
+			
+			returnResult.put(obj);
+		}
+		return returnResult;
 	}
 
 }

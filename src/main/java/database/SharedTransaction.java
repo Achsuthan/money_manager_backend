@@ -2,6 +2,7 @@ package database;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -13,6 +14,8 @@ import org.json.JSONObject;
 
 import constants.GroupConstraints;
 import constants.TransactionConstrains;
+import models.Category;
+import models.Transaction;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
 import unitls.Pair;
@@ -181,6 +184,63 @@ public class SharedTransaction extends DatabaseConnector {
 		} else {
 			return "";
 		}
+	}
+	
+	public Pair<Integer, String> getAllSharedTransactions(String userId) throws Exception {
+		
+		System.out.println(userId);
+		
+		String selectStatement = "select transaction.transactionId as transactionId, transaction.name as transactionName, transaction.description, transaction.amount, transaction.date, transaction.categoryId, transaction.userId as senderId, transaction.transactionTo, transaction.transactionType, shared_transaction.persentage, shared_transaction.receiverUserId as userId, shared_transaction.sennderUserId as senderUserId, user.email, user.name as userName, category.categoryName, category.imageName, category.color from transaction inner join shared_transaction on (shared_transaction.transactionId = transaction.transactionId AND (shared_transaction.sennderUserId=? || shared_transaction.receiverUserId=?)AND transaction.transactionTo='friend') inner join category on(category.categoryId = transaction.categoryId) inner join user on(user.userId = if (shared_transaction.receiverUserId = ?, shared_transaction.sennderUserId, shared_transaction.receiverUserId)) order by transaction.date desc;"
+				+ "";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setNString(1, userId);
+		prepStmt.setNString(2, userId);
+		prepStmt.setNString(3, userId);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		JSONObject transactionObject = new JSONObject();
+		
+		models.SharedTransaction sharedTransaction = new models.SharedTransaction();
+		
+		while (rs.next()) {
+			Double persentage = rs.getDouble("persentage");
+			Double amount = rs.getDouble("amount");
+			String senderId = rs.getString("senderUserId");
+			amount = amount < 0 ? -1 * amount : amount;
+			
+			models.User friend = new models.User();
+			friend.setUserId(senderId.equals(userId) ? rs.getString("userId"): senderId);
+			friend.setEmail(rs.getString("email"));
+			friend.setName(rs.getString("userName"));
+			friend.setPersentage(persentage);
+			friend.setAmount(persentage * amount/ 100);
+			
+			Category cat = new Category();
+			cat.setCategoryId(rs.getString("categoryId"));
+			cat.setCategoryName(rs.getString("categoryName"));
+			cat.setColor(rs.getString("color"));
+			cat.setImageName(rs.getString("imageName"));
+			
+			Transaction trans = new Transaction();
+			trans.setCategory(cat);
+			
+			trans.setAmount(amount);
+			trans.setDate(rs.getDate("date"));
+			trans.setDescription(rs.getString("description"));
+			trans.setIsOwn(senderId.equals(userId) ? true : false);
+			trans.setTransactionId(rs.getString("transactionId"));
+			trans.setTransactionName(rs.getNString("transactionName"));
+			
+			
+			sharedTransaction.addTransaction(trans, friend);
+		}
+		
+		JSONObject obj = new JSONObject();
+		obj.put("transactions", sharedTransaction.getSharedTransactionObject());
+		return new Pair<Integer, String>(200,
+				ApiResponseHandler.apiResponse(ResponseType.SUCCESS, TransactionConstrains.transactionCreatedSuccessfuly, obj));
 	}
 
 }
