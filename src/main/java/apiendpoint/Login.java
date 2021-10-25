@@ -1,6 +1,7 @@
 package apiendpoint;
 
 import java.io.BufferedReader;
+import javax.servlet.FilterChain;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
@@ -11,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.sun.net.httpserver.Filter.Chain;
 
 import constants.UserConstants;
 import database.FriendInvite;
@@ -46,6 +49,7 @@ public class Login extends HttpServlet {
 		// Analyze the servlet exception
 
 		try {
+		    
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 			PrintWriter out = response.getWriter();

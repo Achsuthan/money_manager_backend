@@ -49,7 +49,7 @@ public class GroupInvite extends DatabaseConnector {
 
 									
 									// Handle invite link
-									return handleCreateInviteLink(reciverId, userId, accessLevel, groupId);
+									return handleCreateInviteLink(userId, reciverId, accessLevel, groupId);
 								}
 							} else {
 

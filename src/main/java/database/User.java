@@ -88,6 +88,7 @@ public class User extends DatabaseConnector {
 					JSONObject body = new JSONObject();
 					body.put("userId", rs.getString("userId"));
 					body.put("email", rs.getString("email"));
+					body.put("name", rs.getString("name"));
 					prepStmt.close();
 					remove();
 					return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
