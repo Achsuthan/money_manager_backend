@@ -99,34 +99,33 @@ public class FriendRequest extends DatabaseConnector {
 
 						// Check user exist in the same friendRequest
 						if (checkUserExist(userId, friendRequestId)) {
-							
+
 							// Check user exist in the same friendRequest
 							if (acceptCheckUserExist(userId, friendRequestId)) {
-								
+
 								String accepterName = "";
 								String senderEmail = "";
 								ResultSet friends = getSingleFriendsData(friendRequestId);
 								// Accept friend request
-								if(friends.next()) {
+								if (friends.next()) {
 									String senderId = friends.getNString("senderUserId");
-									
+
 									JSONObject senderObject = user.getSingleUserDetails(senderId);
 									JSONObject receiver = user.getSingleUserDetails(userId);
-									
-									if(senderObject.get("email") != null && receiver.get("name") != null) {
+
+									if (senderObject.get("email") != null && receiver.get("name") != null) {
 										accepterName = (String) receiver.get("name");
 										senderEmail = (String) senderObject.get("email");
 									}
 								}
 								return acceptRequest(friendRequestId, accepterName, senderEmail);
-							}
-							else {
-								
+							} else {
+
 								remove();
-								return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
-										FriendRequestConstraints.senderAccessNotAvailable));
+								return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(
+										ResponseType.FAILURE, FriendRequestConstraints.senderAccessNotAvailable));
 							}
-							
+
 						} else {
 
 							remove();
@@ -151,7 +150,7 @@ public class FriendRequest extends DatabaseConnector {
 
 		} catch (Exception e) {
 
-			System.out.println("error error "+ e);
+			System.out.println("error error " + e);
 			remove();
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
@@ -179,8 +178,30 @@ public class FriendRequest extends DatabaseConnector {
 			return false;
 		}
 	}
-	
-	
+
+	// user exist in the sender or receiver
+	private Boolean checkUserExistWithFriendsStatus(String userId, String requestId) throws Exception {
+
+		String selectStatement = "select * from friends where (senderUserId = ? OR receiverUserId = ?) AND friendsId=? AND isFriends=false;";
+
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+		prepStmt.setString(1, userId);
+		prepStmt.setString(2, userId);
+		prepStmt.setString(3, requestId);
+
+		ResultSet rs = prepStmt.executeQuery();
+
+		if (rs.next()) {
+
+			prepStmt.close();
+			return true;
+		} else {
+
+			prepStmt.close();
+			return false;
+		}
+	}
+
 	// user exist in the receiver
 	private ResultSet getSingleFriendsData(String friendsId) throws Exception {
 
@@ -192,7 +213,7 @@ public class FriendRequest extends DatabaseConnector {
 		ResultSet rs = prepStmt.executeQuery();
 		return rs;
 	}
-	
+
 	// user exist in the receiver
 	private Boolean acceptCheckUserExist(String userId, String requestId) throws Exception {
 
@@ -225,19 +246,18 @@ public class FriendRequest extends DatabaseConnector {
 				// check friends id
 				if (isRequestIdExist(friendRequestId)) {
 
-					System.out.println("request check");
 					// Check user exist in the same friendRequest
-					if (checkUserExist(userId, friendRequestId)) {
-						
-						//Delete request
+					if (checkUserExistWithFriendsStatus(userId, friendRequestId)) {
+
+						// Delete request
 						String selectStatement = "delete from friends where friendsId=?;";
 						PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 						prepStmt.setString(1, friendRequestId);
 
 						prepStmt.executeUpdate();
-						
+
 						remove();
-						//Invite deleted successfully
+						// Invite deleted successfully
 						return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
 								FriendRequestConstraints.deletedSuccess));
 					} else {
@@ -262,7 +282,7 @@ public class FriendRequest extends DatabaseConnector {
 
 		} catch (Exception e) {
 
-			System.out.println("exception exception "+ e);
+			System.out.println("exception exception " + e);
 			remove();
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
@@ -346,7 +366,7 @@ public class FriendRequest extends DatabaseConnector {
 
 		JSONArray arr = new JSONArray();
 		while (rs.next()) {
-			
+
 			User user = new User();
 			JSONObject obj = new JSONObject();
 			obj = user.getSingleUserDetails(rs.getString("receiverUserId"));
@@ -372,12 +392,12 @@ public class FriendRequest extends DatabaseConnector {
 		JSONArray arr = new JSONArray();
 		while (rs.next()) {
 			User user = new User();
-			
+
 			JSONObject obj = new JSONObject();
 			obj = user.getSingleUserDetails(rs.getString("senderUserId"));
 			obj.put("friendsId", rs.getString("friendsId"));
 			arr.put(obj);
-			
+
 		}
 
 		prepStmt.close();
@@ -429,8 +449,7 @@ public class FriendRequest extends DatabaseConnector {
 		}
 
 	}
-	
-	
+
 	// Is friends
 	public Boolean isFriendsWithUserId(String userId1, String userId2) throws Exception {
 
@@ -527,30 +546,29 @@ public class FriendRequest extends DatabaseConnector {
 		int x = prepStmt.executeUpdate();
 
 		if (x == 1) {
-			
-			User user  = new User();
-			
+
+			User user = new User();
+
 			JSONObject sender = user.getSingleUserDetails(userId);
-			JSONObject receiver  = user.getSingleUserDetails(friendId);
-			
-			if(sender.get("name") != null && receiver.get("email") != null) {
-				String senderName  = (String) sender.getString("name");
+			JSONObject receiver = user.getSingleUserDetails(friendId);
+
+			if (sender.get("name") != null && receiver.get("email") != null) {
+				String senderName = (String) sender.getString("name");
 				String reciverEmail = (String) receiver.getString("email");
 				Helper.sendMail(senderName + " send you friend request", "Friend Request", reciverEmail);
 			}
-			
-			
+
 			prepStmt.close();
 			remove();
 			// TODO: If required can send email
-			return new Pair<Integer, String>(200,
-					ApiResponseHandler.apiResponse(ResponseType.SUCCESS, FriendRequestConstraints.friendsCreatedSuccessfully));
+			return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
+					FriendRequestConstraints.friendsCreatedSuccessfully));
 		} else {
 
 			prepStmt.close();
 			remove();
-			return new Pair<Integer, String>(400,
-					ApiResponseHandler.apiResponse(ResponseType.FAILURE, FriendRequestConstraints.friendsCreationFailed));
+			return new Pair<Integer, String>(400, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
+					FriendRequestConstraints.friendsCreationFailed));
 		}
 	}
 

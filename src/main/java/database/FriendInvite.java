@@ -139,7 +139,7 @@ public class FriendInvite extends DatabaseConnector {
 						prepStmt.executeUpdate();
 						
 						//Invite deleted successfully
-						return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.FAILURE,
+						return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
 								InviteConstants.inviteDeletedSuccessfully));
 					}
 					else {

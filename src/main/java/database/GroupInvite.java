@@ -21,7 +21,8 @@ public class GroupInvite extends DatabaseConnector {
 	}
 
 	// Create group Invite link
-	public Pair<Integer, String> createGroupInvite(String userId, Integer accessLevel, String reciverId, String groupId) {
+	public Pair<Integer, String> createGroupInvite(String userId, Integer accessLevel, String reciverId,
+			String groupId) {
 
 		try {
 
@@ -35,8 +36,8 @@ public class GroupInvite extends DatabaseConnector {
 					if (group.checkGroupExist(groupId)) {
 
 						FriendRequest friendRequest = new FriendRequest();
-						if(friendRequest.isFriendsWithUserId(userId, reciverId)) {
-							
+						if (friendRequest.isFriendsWithUserId(userId, reciverId)) {
+
 							if (group.checkOwerner(userId, groupId)) {
 
 								if (group.checkUserAlreadyHaveAccessToSameGroup(reciverId, groupId)) {
@@ -47,7 +48,6 @@ public class GroupInvite extends DatabaseConnector {
 											.apiResponse(ResponseType.FAILURE, InviteConstants.userAlreadyInGroup));
 								} else {
 
-									
 									// Handle invite link
 									return handleCreateInviteLink(userId, reciverId, accessLevel, groupId);
 								}
@@ -58,9 +58,8 @@ public class GroupInvite extends DatabaseConnector {
 								return new Pair<Integer, String>(400,
 										ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.noAccess));
 							}
-						}
-						else {
-							
+						} else {
+
 							// User already in the same group
 							remove();
 							return new Pair<Integer, String>(400,
@@ -97,15 +96,11 @@ public class GroupInvite extends DatabaseConnector {
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
 	}
-	
+
 	// Create group Invite link
 	/*
-	 * 1. Check user 
-	 * 2. Check the  groupInvite 
-	 * 3. User in the group invite
-	 * 4. Check the expire time 
-	 * 5. Create the Access Level 
-	 * 6. Delete the group invite
+	 * 1. Check user 2. Check the groupInvite 3. User in the group invite 4. Check
+	 * the expire time 5. Create the Access Level 6. Delete the group invite
 	 */
 	public Pair<Integer, String> acceptGroupInvite(String userId, String groupInviteId) {
 
@@ -114,59 +109,54 @@ public class GroupInvite extends DatabaseConnector {
 			// User check
 			User user = new User();
 			if (user.CheckUserExist(userId)) {
-				
+
 				ResultSet result = getSingleInvite(groupInviteId);
-				
-				if(result.next()) {
-					
+
+				if (result.next()) {
+
 					String receiverUserId = result.getString("reciveruserId");
-					
-					if(userId.equals(receiverUserId)) {
-						
-						
+
+					if (userId.equals(receiverUserId)) {
+
 						Calendar cal = Calendar.getInstance();
 						long timeNow = cal.getTimeInMillis();
 						java.sql.Timestamp currentTime = new java.sql.Timestamp(timeNow);
-						
+
 						java.sql.Timestamp expiryTime = result.getTimestamp("expiryTime");
-						
+
 						if (expiryTime.compareTo(currentTime) > 0) {
 
 							Integer accessLevel = result.getInt("accessLevel");
-							String groupId  = result.getString("inviteGroupId");
-							
-							if(deleteSingleInvite(groupInviteId)) {
-								
+							String groupId = result.getString("inviteGroupId");
+
+							if (deleteSingleInvite(groupInviteId)) {
+
 								Group group = new Group();
 								return group.createAccessLevel(userId, groupId, accessLevel, true);
-							}
-							else {
-								
+							} else {
+
 								// user not found
 								remove();
-								return new Pair<Integer, String>(400,
-										ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.deleteGroupInviteFailed));
+								return new Pair<Integer, String>(400, ApiResponseHandler
+										.apiResponse(ResponseType.FAILURE, InviteConstants.deleteGroupInviteFailed));
 							}
-						} 
-						else {
-							
+						} else {
+
 							// user not found
 							remove();
 							return new Pair<Integer, String>(400,
 									ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.linkExpired));
 						}
-						
-					}
-					else {
-						
+
+					} else {
+
 						// user not found
 						remove();
 						return new Pair<Integer, String>(400,
 								ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.noAccess));
 					}
-				}
-				else {
-					
+				} else {
+
 					// user not found
 					remove();
 					return new Pair<Integer, String>(400,
@@ -188,15 +178,15 @@ public class GroupInvite extends DatabaseConnector {
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
 	}
-	
+
 	private Boolean deleteSingleInvite(String groupInviteId) throws Exception {
-		
+
 		String selectStatement = "delete from group_invite where groupInviteId=?;";
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 		prepStmt.setString(1, groupInviteId);
 
 		prepStmt.executeUpdate();
-		
+
 		return true;
 	}
 
@@ -209,11 +199,10 @@ public class GroupInvite extends DatabaseConnector {
 				JSONObject obj = new JSONObject();
 				obj.put("sendRequest", getSendRequest(userId));
 				obj.put("receiveRequest", getReceiveRequest(userId));
-				
+
 				remove();
-				return new Pair<Integer, String>(200,
-						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
-			
+				return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
+
 			} else {
 
 				// user not found
@@ -229,12 +218,12 @@ public class GroupInvite extends DatabaseConnector {
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
 	}
-	
-	//Get send request
+
+	// Get send request
 	private JSONArray getSendRequest(String userId) throws Exception {
-		
+
 		JSONArray request = new JSONArray();
-		
+
 		String selectStatement = "select * from group_invite where userId=?;";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
@@ -249,41 +238,59 @@ public class GroupInvite extends DatabaseConnector {
 			obj.put("accessLevel", rs.getString("accessLevel"));
 			obj.put("groupInviteId", groupInviteId);
 			obj.put("inviteLink", Helper.createInviteLink(groupInviteId));
-			
+			obj.put("groupName", "");
+
+			String gorupId = rs.getString("inviteGroupId");
+			Group grp = new Group();
+			ResultSet groupRs = grp.getsingleGroup(gorupId);
+			if (groupRs.next()) {
+				System.out.println(groupRs.getString("name"));
+				obj.put("groupName", groupRs.getString("name"));
+			}
+
 			String receiverUserId = rs.getString("reciverUserId");
 			User user = new User();
 			obj.put("receiver", user.getSingleUserDetails(receiverUserId));
-			
+
 			request.put(obj);
-		} 
+		}
 		return request;
 	}
-	
-	//Get send request
-		private JSONArray getReceiveRequest(String userId) throws Exception {
-			
-			JSONArray request = new JSONArray();
-			
-			String selectStatement = "select * from group_invite where reciverUserId=?;";
 
-			PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+	// Get send request
+	private JSONArray getReceiveRequest(String userId) throws Exception {
 
-			prepStmt.setNString(1, userId);
-			ResultSet rs = prepStmt.executeQuery();
+		JSONArray request = new JSONArray();
 
-			while (rs.next()) {
+		String selectStatement = "select * from group_invite where reciverUserId=?;";
 
-				String groupInviteId = rs.getString("groupInviteId");
-				JSONObject obj = new JSONObject();
-				obj.put("accessLevel", rs.getString("accessLevel"));
-				obj.put("groupInviteId", groupInviteId);
-				obj.put("inviteLink", Helper.createInviteLink(groupInviteId));
-				User user = new User();
-				obj.put("sender", user.getSingleUserDetails(rs.getString("userId")));
-				request.put(obj);
-			} 
-			return request;
+		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+
+		prepStmt.setNString(1, userId);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+
+			String groupInviteId = rs.getString("groupInviteId");
+			JSONObject obj = new JSONObject();
+			obj.put("accessLevel", rs.getString("accessLevel"));
+			obj.put("groupInviteId", groupInviteId);
+			obj.put("inviteLink", Helper.createInviteLink(groupInviteId));
+			obj.put("groupName", "");
+
+			String gorupId = rs.getString("inviteGroupId");
+			Group grp = new Group();
+			ResultSet groupRs = grp.getsingleGroup(gorupId);
+			if (groupRs.next()) {
+				obj.put("groupName", groupRs.getString("name"));
+			}
+
+			User user = new User();
+			obj.put("sender", user.getSingleUserDetails(rs.getString("userId")));
+			request.put(obj);
 		}
+		return request;
+	}
 
 	// Handle invite link
 	private Pair<Integer, String> handleCreateInviteLink(String userId, String reciverUserId, Integer accessLevel,
@@ -380,34 +387,35 @@ public class GroupInvite extends DatabaseConnector {
 				if (singleInvite.next()) {
 
 					JSONObject obj = new JSONObject();
-					String link =  Helper.createInviteLink(singleInvite.getString("groupInviteId"));
-					obj.put("Link",link);
-					
+					String link = Helper.createInviteLink(singleInvite.getString("groupInviteId"));
+					obj.put("Link", link);
+
 					// TODO: Can send the email here
 					User user = new User();
 					Group group = new Group();
 					ResultSet singleGroup = group.getsingleGroup(groupId);
 					String groupName = "";
-					if(singleGroup.next()) {
+					if (singleGroup.next()) {
 						groupName = singleGroup.getNString("name");
 					}
-					
+
 					JSONObject senderUser = user.getSingleUserDetails(userId);
 					JSONObject receiverUser = user.getSingleUserDetails(receiverUserId);
-					
+
 					String senderUsername = "";
 					String receiverEmail = "";
-					
-					
-					if(senderUser.get("name") != null && receiverUser.get("email") != null) {
-						
+
+					if (senderUser.get("name") != null && receiverUser.get("email") != null) {
+
 						senderUsername = (String) senderUser.get("name");
 						receiverEmail = (String) receiverUser.get("email");
 					}
-					
-					Helper.sendMail(senderUsername + " invite you to the " + groupName +" Group"+ "\n By clicking the link you can join to the group link: " + link, "Group Invite", receiverEmail);
-					
-					
+
+					Helper.sendMail(
+							senderUsername + " invite you to the " + groupName + " Group"
+									+ "\n By clicking the link you can join to the group link: " + link,
+							"Group Invite", receiverEmail);
+
 					remove();
 					return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
 							InviteConstants.inviteCreatedSuccessfully, obj));
@@ -540,6 +548,59 @@ public class GroupInvite extends DatabaseConnector {
 
 		ResultSet rs = prepStmt.executeQuery();
 		return rs;
+	}
+
+	public Pair<Integer, String> deleteGroupInvite(String userId, String groupInviteId) throws Exception {
+
+		try {
+
+			// User check
+			User user = new User();
+			if (user.CheckUserExist(userId)) {
+
+				ResultSet result = getSingleInvite(groupInviteId);
+
+				if (result.next()) {
+
+					String receiverUserId = result.getString("reciveruserId");
+					String senderId = result.getString("userId");
+
+					if (userId.equals(receiverUserId) ||  userId.equals(senderId)) {
+
+						deleteSingleInvite(groupInviteId);
+						remove();
+						return new Pair<Integer, String>(200,
+								ApiResponseHandler.apiResponse(ResponseType.SUCCESS, InviteConstants.inviteDeletedSuccess));
+
+					} else {
+
+						// user not found
+						remove();
+						return new Pair<Integer, String>(400,
+								ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.noAccess));
+					}
+				} else {
+
+					// user not found
+					remove();
+					return new Pair<Integer, String>(400,
+							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.iviteNotExist));
+				}
+
+			} else {
+
+				// user not found
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userNotExist));
+			}
+		} catch (Exception e) {
+
+			System.out.println("error error " + e);
+			// Exception
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
 	}
 
 }

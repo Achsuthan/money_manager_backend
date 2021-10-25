@@ -183,7 +183,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"friendId\": \"USR-11111112\"\n}",
+							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"friendId\": \"USR-11111113\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -209,7 +209,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"friendsRequestId\": \"FRI-11111111\",\n    \"userId\": \"USR-11111111\"\n}",
+							"raw": "{\n    \"friendsRequestId\": \"FRI-11111112\",\n    \"userId\": \"USR-11111113\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -248,7 +248,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/friend-request?userId=USR-11111114",
+							"raw": "{{baseUrl}}/friend-request?userId=USR-11111111",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -258,7 +258,7 @@
 							"query": [
 								{
 									"key": "userId",
-									"value": "USR-11111114"
+									"value": "USR-11111111"
 								}
 							]
 						}
@@ -308,7 +308,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"keyword\": \"an\",\n    \"userId\": \"USR-11111111\",\n    \"searchType\": \"2\"\n}",
+							"raw": "{\n    \"keyword\": \"an\",\n    \"userId\": \"USR-11111111\",\n    \"searchType\": \"0\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -339,7 +339,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"reciverId\": \"USR-11111112\",\n    \"userId\": \"USR-11111111\",\n    \"accessLevel\": \"2\",\n    \"groupId\": \"GRP-11111111\"\n}",
+							"raw": "{\n    \"reciverId\": \"USR-11111111\",\n    \"userId\": \"USR-11111113\",\n    \"accessLevel\": \"2\",\n    \"groupId\": \"GRP-11111113\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -359,12 +359,21 @@
 					"response": []
 				},
 				{
-					"name": "Get All Group Invite",
+					"name": "Create Invitation Delete",
 					"request": {
-						"method": "GET",
+						"method": "DELETE",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{baseUrl}}/group-invite?userId=USR-11111112",
+							"raw": "{{baseUrl}}/group-invite?userId=USR-11111111&groupInviteId=GIV-11111111",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -374,7 +383,34 @@
 							"query": [
 								{
 									"key": "userId",
-									"value": "USR-11111112"
+									"value": "USR-11111111"
+								},
+								{
+									"key": "groupInviteId",
+									"value": "GIV-11111111"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Group Invite",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group-invite?userId=USR-11111111",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group-invite"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111111"
 								}
 							]
 						}
@@ -419,7 +455,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"groupName\": \"Project Dirty Mind\"\n}",
+							"raw": "{\n    \"userId\": \"USR-11111113\",\n    \"groupName\": \"Project Dirty Mind\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -546,11 +582,8 @@
 				},
 				{
 					"name": "Get Own Transactions",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -562,12 +595,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/transaction",
+							"raw": "{{baseUrl}}/getTransactions",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"transaction"
+								"getTransactions"
 							]
 						}
 					},
@@ -575,15 +608,12 @@
 				},
 				{
 					"name": "Get Friends Transactions",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"friend\"\n}",
+							"raw": "{\n    \"userId\": \"USR-11111115\",\n    \"transactionTo\": \"friend\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -591,12 +621,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/transaction",
+							"raw": "{{baseUrl}}/getTransactions",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"transaction"
+								"getTransactions"
 							]
 						}
 					},
@@ -604,15 +634,12 @@
 				},
 				{
 					"name": "Get Group Transactions",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
-						"method": "GET",
+						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"group\"\n}",
+							"raw": "{\n    \"userId\": \"USR-11111115\",\n    \"transactionTo\": \"group\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -620,12 +647,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/transaction",
+							"raw": "{{baseUrl}}/getTransactions",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"transaction"
+								"getTransactions"
 							]
 						}
 					},

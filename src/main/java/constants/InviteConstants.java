@@ -31,6 +31,7 @@ public class InviteConstants {
 	public static String linkExpired = "Invite link Expired";
 	public static String deleteGroupInviteFailed = "Delete group invite failed please try again later";
 	public static String userExistForInvite = "This email is already exist please try again with new email";
+	public static String inviteDeletedSuccess = "Invite deleted successfully";
 	
 	
 	//mail 

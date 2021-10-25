@@ -159,5 +159,54 @@ public class GroupInvite extends HttpServlet {
 			throw new ServletException(e);
 		}
 	}
+	
+	/**
+	 * @see HttpServlet#doDelete(HttpServletRequest, HttpServletResponse)
+	 */
+	protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		try {
+
+			response.setContentType("application/json");
+			response.setCharacterEncoding("utf-8");
+			PrintWriter out = response.getWriter();
+
+			// User Session check
+			if (TokenHanler.checkToken()) {
+
+				String groupInviteId = request.getParameter("groupInviteId");
+				String userId = request.getParameter("userId");
+
+				if (groupInviteId != null && userId != null) {
+
+					// Handle the delete invite
+					database.GroupInvite invite = new database.GroupInvite();
+					Pair<Integer, String> loginOutput = invite.deleteGroupInvite(userId, groupInviteId);
+					response.setStatus(loginOutput.getKey());
+					out.print(loginOutput.getValue());
+				} else {
+
+					// All the required data not found in the API body
+					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+					out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
+				}
+
+			} else {
+
+				// User session not found
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				out.print(ApiResponseHandler.apiResponse(ResponseType.UNAUTHORIZED));
+			}
+
+			out.flush();
+
+		} catch (Exception e) {
+
+			// Exception
+			LogsHandler.logs();
+			throw new ServletException(e);
+		}
+	}
 
 }

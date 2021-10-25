@@ -88,7 +88,14 @@ public class Search extends HttpServlet {
 						Pair<Integer, String> searchResult = search.searchUserByAllAndFriends(keyword, userId);
 						response.setStatus(searchResult.getKey());
 						out.print(searchResult.getValue());
-					} else {
+						
+					} else if (searchType.equals("3")) {
+						database.Search search = new database.Search();
+						Pair<Integer, String> searchResult = search.searchUserNotInFriends(keyword, userId);
+						response.setStatus(searchResult.getKey());
+						out.print(searchResult.getValue());
+					}
+					else {
 						response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 						out.print(ApiResponseHandler.apiResponse(ResponseType.DATAMISSING));
 					}
