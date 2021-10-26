@@ -84,8 +84,9 @@ public class GetTransacitons extends HttpServlet {
 					}
 					else {
 						//Group
+						String groupId =  (String) jsonBody.get("groupId"); 
 						GroupTransaction transaction = new GroupTransaction();						
-						Pair<Integer, String> obj = transaction.getAllGroupTransactions(userId);
+						Pair<Integer, String> obj = transaction.getAllGroupTransactions(userId, groupId);
 						response.setStatus(obj.getKey());
 						out.print(obj.getValue());
 					}

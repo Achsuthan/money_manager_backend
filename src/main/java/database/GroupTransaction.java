@@ -252,28 +252,39 @@ public class GroupTransaction extends DatabaseConnector {
 		}
 	}
 
-	public Pair<Integer, String> getAllGroupTransactions(String userId) throws Exception {
+	public Pair<Integer, String> getAllGroupTransactions(String userId, String groupId) throws Exception {
 
 		try {
 			User user = new User();
 			if (user.CheckUserExist(userId)) {
 				
-				String selectStatement = "select transaction.transactionId as transactionId, transaction.name as transactionName, transaction.description, transaction.amount, transaction.date, transaction.categoryId, transaction.userId as senderId, transaction.transactionTo, transaction.transactionType, shared_transaction.persentage, shared_transaction.receiverUserId as userId, shared_transaction.sennderUserId as senderUserId, user.email, user.name as userName, category.categoryName, category.imageName, category.color, spending_group.name as groupName, spending_group.groupId from transaction inner join shared_transaction on (shared_transaction.transactionId = transaction.transactionId AND (shared_transaction.sennderUserId=? || shared_transaction.receiverUserId=?)AND transaction.transactionTo='group') inner join group_transaction on (shared_transaction.sharedTransactionId = group_transaction.sharedTransactionId) inner join spending_group on (spending_group.groupId = group_transaction.groupId) inner join category on(category.categoryId = transaction.categoryId) inner join user on(user.userId = if (shared_transaction.receiverUserId = ?, shared_transaction.sennderUserId, shared_transaction.receiverUserId)) order by transaction.date desc;";
+				String selectStatement = "select transaction.transactionId as transactionId, transaction.name as transactionName, transaction.description, transaction.amount, transaction.date, transaction.categoryId, transaction.userId as senderId, transaction.transactionTo, transaction.transactionType, shared_transaction.persentage, shared_transaction.receiverUserId as userId, shared_transaction.sennderUserId as senderUserId, user.email, user.name as userName, category.categoryName, category.imageName, category.color, spending_group.name as groupName, spending_group.groupId from transaction inner join shared_transaction on (shared_transaction.transactionId = transaction.transactionId AND (shared_transaction.sennderUserId=? || shared_transaction.receiverUserId=?)AND transaction.transactionTo='group') inner join group_transaction on (shared_transaction.sharedTransactionId = group_transaction.sharedTransactionId) inner join spending_group on (spending_group.groupId = group_transaction.groupId AND group_transaction.groupId=?) inner join category on(category.categoryId = transaction.categoryId) inner join user on(user.userId = if (shared_transaction.receiverUserId = ?, shared_transaction.sennderUserId, shared_transaction.receiverUserId)) order by transaction.date desc;";
 
 				PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 				prepStmt.setNString(1, userId);
 				prepStmt.setNString(2, userId);
-				prepStmt.setNString(3, userId);
+				prepStmt.setNString(3, groupId);
+				prepStmt.setNString(4, userId);
 
 				ResultSet rs = prepStmt.executeQuery();
 
 				models.SharedTransaction sharedTransaction = new models.SharedTransaction();
+				
+				Double youSpent = 0.0;
+				Double youReceived = 0.0; 
 
 				while (rs.next()) {
 					Double persentage = rs.getDouble("persentage");
 					Double amount = rs.getDouble("amount");
 					String senderId = rs.getString("senderUserId");
 					amount = amount < 0 ? -1 * amount : amount;
+					
+					if(senderId.equals(userId)) {
+						youSpent += persentage * amount/ 100;
+					}
+					else {
+						youReceived += persentage * amount/ 100;
+					}
 
 					models.User friend = new models.User();
 					friend.setUserId(senderId.equals(userId) ? rs.getString("userId") : senderId);
@@ -308,6 +319,20 @@ public class GroupTransaction extends DatabaseConnector {
 
 				JSONObject obj = new JSONObject();
 				obj.put("transactions", sharedTransaction.getSharedTransactionObject());
+				
+				obj.put("youSpent", youSpent);
+				obj.put("youReceive", youReceived);
+				
+				String groupName = "";
+				Group grp = new Group();
+				ResultSet grpRs = grp.getsingleGroup(groupId);
+				if(grpRs.next()) {
+					groupName = grpRs.getString("name");
+				}
+				
+				obj.put("groupName", groupName);
+				
+				
 				return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
 						TransactionConstrains.transactionCreatedSuccessfuly, obj));
 			} else {

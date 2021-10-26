@@ -180,7 +180,6 @@ public class SharedTransaction extends DatabaseConnector {
 
 				ResultSet rs = prepStmt.executeQuery();
 				
-				models.SharedTransaction sharedTransaction = new models.SharedTransaction();
 				JSONArray returnArray = new JSONArray();
 				
 				while (rs.next()) {
@@ -252,6 +251,9 @@ public class SharedTransaction extends DatabaseConnector {
 
 				ResultSet rs = prepStmt.executeQuery();
 				
+				Double youSpent = 0.0;
+				Double youReceived = 0.0; 
+				
 				models.SharedTransaction sharedTransaction = new models.SharedTransaction();
 				
 				while (rs.next()) {
@@ -259,6 +261,13 @@ public class SharedTransaction extends DatabaseConnector {
 					Double amount = rs.getDouble("amount");
 					String senderId = rs.getString("senderUserId");
 					amount = amount < 0 ? -1 * amount : amount;
+					
+					if(senderId.equals(userId)) {
+						youSpent += persentage * amount/ 100;
+					}
+					else {
+						youReceived += persentage * amount/ 100;
+					}
 					
 					models.User friend = new models.User();
 					friend.setUserId(senderId.equals(userId) ? rs.getString("userId"): senderId);
@@ -289,6 +298,8 @@ public class SharedTransaction extends DatabaseConnector {
 				
 				JSONObject obj = new JSONObject();
 				obj.put("transactions", sharedTransaction.getSharedTransactionObject());
+				obj.put("youSpent", youSpent);
+				obj.put("youReceive", youReceived);
 				return new Pair<Integer, String>(200,
 						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, TransactionConstrains.transactionCreatedSuccessfuly, obj));
 				
