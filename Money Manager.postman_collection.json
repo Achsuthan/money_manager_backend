@@ -339,7 +339,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"reciverId\": \"USR-11111111\",\n    \"userId\": \"USR-11111113\",\n    \"accessLevel\": \"2\",\n    \"groupId\": \"GRP-11111113\"\n}",
+							"raw": "{\n    \"reciverId\": \"USR-11111113\",\n    \"userId\": \"USR-11111111\",\n    \"accessLevel\": \"2\",\n    \"groupId\": \"GRP-11111111\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -653,6 +653,171 @@
 							],
 							"path": [
 								"getTransactions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category",
+			"item": [
+				{
+					"name": "Get Categories",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 100.0,\n    \"date\": \"2021-10-20\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 90.0\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/GetCategories",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"GetCategories"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Group Transacitons",
+			"item": [
+				{
+					"name": "Get User By Transaciton for Friend",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionId\": \"TRA-11111155\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/GetUserByTransacitonFriend",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"GetUserByTransacitonFriend"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Transaciton for Group",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionId\": \"TRA-11111145\",\n    \"groupId\": \"GRP-11111111\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/GetUserByTransactionIdGroup",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"GetUserByTransactionIdGroup"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Users from Group",
+			"item": [
+				{
+					"name": "Get Users from Group",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionId\": \"TRA-11111155\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/GetUserByTransacitonFriend",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"GetUserByTransacitonFriend"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Group Invite Link By Group ID",
+			"item": [
+				{
+					"name": "Get Group Invite Link By Group ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionId\": \"TRA-11111155\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/GetUserByTransacitonFriend",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"GetUserByTransacitonFriend"
 							]
 						}
 					},
