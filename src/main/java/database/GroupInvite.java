@@ -7,6 +7,7 @@ import java.util.Calendar;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import constants.GroupConstraints;
 import constants.InviteConstants;
 import unitls.ApiResponseHandler;
 import unitls.Helper;
@@ -174,6 +175,53 @@ public class GroupInvite extends DatabaseConnector {
 
 			System.out.println("error error " + e);
 			// Exception
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+
+	// Create group
+	public Pair<Integer, String> getAllGroupInviteByGroupId(String userId, String groupId) {
+
+		try {
+
+			// Check user
+			User user = new User();
+			if (user.CheckUserExist(userId)) {
+
+				String selectStatement = "select * from group_invite where inviteGroupId=? AND userId=?;";
+
+				PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+				prepStmt.setNString(1, groupId);
+				prepStmt.setNString(2, userId);
+
+				ResultSet rs = prepStmt.executeQuery();
+
+				JSONArray returnArray = new JSONArray();
+
+				while (rs.next()) {
+
+					JSONObject obj = new JSONObject();
+
+					obj.put("groupInviteId", rs.getString("groupInviteId"));
+					obj.put("inviteLink", Helper.createInviteLink(rs.getString("groupInviteId")));
+					obj.put("receiver", user.getSingleUserDetails(rs.getString("reciveruserId")));
+					returnArray.put(obj);
+				}
+				JSONObject obj = new JSONObject();
+				obj.put("groupInvites", returnArray);
+
+				remove();
+				return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
+
+			} else {
+
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.userNotFound));
+			}
+		} catch (Exception e) {
+			System.out.println("error errror" + e);
 			remove();
 			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
 		}
@@ -565,12 +613,12 @@ public class GroupInvite extends DatabaseConnector {
 					String receiverUserId = result.getString("reciveruserId");
 					String senderId = result.getString("userId");
 
-					if (userId.equals(receiverUserId) ||  userId.equals(senderId)) {
+					if (userId.equals(receiverUserId) || userId.equals(senderId)) {
 
 						deleteSingleInvite(groupInviteId);
 						remove();
-						return new Pair<Integer, String>(200,
-								ApiResponseHandler.apiResponse(ResponseType.SUCCESS, InviteConstants.inviteDeletedSuccess));
+						return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
+								InviteConstants.inviteDeletedSuccess));
 
 					} else {
 

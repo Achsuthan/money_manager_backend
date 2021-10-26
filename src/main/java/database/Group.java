@@ -56,6 +56,53 @@ public class Group extends DatabaseConnector {
 		}
 	}
 
+	// Create group
+	public Pair<Integer, String> getUsersFromGroup(String userId, String groupId) {
+
+		try {
+
+			// Check user
+			User user = new User();
+			if (user.CheckUserExist(userId)) {
+
+				String selectStatement = "select user.userId, user.email, user.name from user inner join access_level on (user.userId = access_level.userId AND access_level.isAccepted=true AND access_level.groupId=?) where user.userId !=?;";
+
+				PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+				prepStmt.setNString(1, groupId);
+				prepStmt.setNString(2, userId);
+
+				ResultSet rs = prepStmt.executeQuery();
+
+				JSONArray returnArray = new JSONArray();
+
+				while (rs.next()) {
+
+					JSONObject obj = new JSONObject();
+
+					obj.put("userId", rs.getString("userId"));
+					obj.put("email", rs.getString("email"));
+					obj.put("userName", rs.getString("name"));
+					returnArray.put(obj);
+				}
+				JSONObject obj = new JSONObject();
+				obj.put("users", returnArray);
+
+				remove();
+				return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
+
+			} else {
+
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.userNotFound));
+			}
+		} catch (Exception e) {
+			System.out.println("error errror" + e);
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
+
 	// Get all the groups
 	public Pair<Integer, String> getAllGroup(String userId) {
 

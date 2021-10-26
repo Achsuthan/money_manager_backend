@@ -179,6 +179,59 @@ public class GroupTransaction extends DatabaseConnector {
 			return result;
 		}
 	}
+	
+	
+
+	public Pair<Integer, String> getUsersByTransactionsIdGroupId(String userId, String TransacitonId, String groupId) {
+
+		try {
+			User user = new User();
+			if (user.CheckUserExist(userId)) {
+
+				String selectStatement = "select transaction.amount, shared_transaction.persentage, shared_transaction.receiverUserId as userId, user.email, user.name as userName from transaction inner join shared_transaction  on (shared_transaction.transactionId = transaction.transactionId  AND shared_transaction.transactionId=? AND transaction.transactionTo='group') inner join group_transaction on (shared_transaction.sharedTransactionId = group_transaction.sharedTransactionId) inner join spending_group on (spending_group.groupId = group_transaction.groupId AND spending_group.groupId=?) inner join user on(user.userId = shared_transaction.receiverUserId);";
+
+				PreparedStatement prepStmt = con.prepareStatement(selectStatement);
+				prepStmt.setNString(1, TransacitonId);
+				prepStmt.setNString(2, groupId);
+
+				ResultSet rs = prepStmt.executeQuery();
+				
+				models.SharedTransaction sharedTransaction = new models.SharedTransaction();
+				JSONArray returnArray = new JSONArray();
+				
+				while (rs.next()) {
+					
+					JSONObject obj = new JSONObject();
+					
+					Double persentage = rs.getDouble("persentage");
+					Double amount = rs.getDouble("amount");
+					amount = amount < 0 ? -1 * amount : amount;
+					
+					obj.put("userId", rs.getString("userId"));
+					obj.put("email", rs.getString("email"));
+					obj.put("userName", rs.getString("userName"));
+					obj.put("persentage", persentage);
+					obj.put("amount", persentage * amount/ 100);
+					returnArray.put(obj);
+				}
+				JSONObject obj = new JSONObject();
+				obj.put("users", returnArray);
+				
+				remove();
+				return new Pair<Integer, String>(200,
+						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
+			} else {
+
+				remove();
+				return new Pair<Integer, String>(400,
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, GroupConstraints.userNotFound));
+			}
+		} catch (Exception e) {
+			System.out.println("error errror" + e);
+			remove();
+			return new Pair<Integer, String>(500, ApiResponseHandler.apiResponse(ResponseType.SERVERERROR));
+		}
+	}
 
 	// Get Last transaction based on ID
 	private String getLastTransactionId() throws Exception {
