@@ -613,7 +613,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111115\",\n    \"transactionTo\": \"friend\"\n}",
+							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"friend\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -639,7 +639,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111115\",\n    \"transactionTo\": \"group\"\n}",
+							"raw": "{\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"group\",\n    \"groupId\":\"GRP-11111111\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
