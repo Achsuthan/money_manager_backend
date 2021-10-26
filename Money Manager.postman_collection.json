@@ -715,7 +715,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/GetUserByTransacitonFriend?userId=USR-11111112&transactionId=TRA-11111155",
+							"raw": "{{baseUrl}}/GetUserByTransacitonFriend?userId=USR-11111111&transactionId=TRA-11111155",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -725,7 +725,7 @@
 							"query": [
 								{
 									"key": "userId",
-									"value": "USR-11111112"
+									"value": "USR-11111111"
 								},
 								{
 									"key": "transactionId",
@@ -786,28 +786,26 @@
 			"item": [
 				{
 					"name": "Get Users from Group",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionId\": \"TRA-11111155\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{baseUrl}}/GetUserByTransacitonFriend",
+							"raw": "{{baseUrl}}/GetUsersFromGroup?userId=USR-11111111&groupId=GRP-11111112",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"GetUserByTransacitonFriend"
+								"GetUsersFromGroup"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111111"
+								},
+								{
+									"key": "groupId",
+									"value": "GRP-11111112"
+								}
 							]
 						}
 					},
@@ -828,7 +826,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionId\": \"TRA-11111155\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -836,12 +834,22 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/GetUserByTransacitonFriend",
+							"raw": "{{baseUrl}}/GetGroupInviteLinkByGroupId?userId=USR-11111111&groupId=GRP-11111111",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"GetUserByTransacitonFriend"
+								"GetGroupInviteLinkByGroupId"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111111"
+								},
+								{
+									"key": "groupId",
+									"value": "GRP-11111111"
+								}
 							]
 						}
 					},
