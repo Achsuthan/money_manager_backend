@@ -47,27 +47,18 @@ public class GetGroupInviteLinkByGroupId extends HttpServlet {
 
 			// user session handler
 			if (TokenHanler.checkToken()) {
+				
+				String userId = request.getParameter("userId");
+				String groupId = request.getParameter("groupId");
+				
 
-				StringBuffer jb = new StringBuffer();
-				String line = null;
-
-				BufferedReader reader = request.getReader();
-				while ((line = reader.readLine()) != null)
-					jb.append(line);
-
-				JSONObject jsonBody = new JSONObject(jb.toString());
-
-				try {
-
-					String userId = (String) jsonBody.get("userId");
-					String groupId = (String) jsonBody.get("groupId");
-
+				if(userId != null && groupId != null) {
 					GroupInvite group = new GroupInvite();
 					Pair<Integer, String> groupResult = group.getAllGroupInviteByGroupId(userId, groupId);
 					response.setStatus(groupResult.getKey());
 					out.print(groupResult.getValue());
 
-				} catch (JSONException e) {
+				} else {
 
 					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

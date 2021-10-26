@@ -51,20 +51,11 @@ public class GetUserByTransactionIdGroup extends HttpServlet {
 			// user session handler
 			if (TokenHanler.checkToken()) {
 
-				StringBuffer jb = new StringBuffer();
-				String line = null;
+				String userId = request.getParameter("userId");
+				String transactionId = request.getParameter("transactionId");
+				String groupId = request.getParameter("groupId");
 
-				BufferedReader reader = request.getReader();
-				while ((line = reader.readLine()) != null)
-					jb.append(line);
-
-				JSONObject jsonBody = new JSONObject(jb.toString());
-
-				try {
-
-					String userId = (String) jsonBody.get("userId");
-					String transactionId = (String) jsonBody.get("transactionId");
-					String groupId = (String) jsonBody.get("groupId");
+				if(userId != null && transactionId != null && groupId != null) {
 
 					GroupTransaction group = new GroupTransaction();
 					Pair<Integer, String> groupResult = group.getUsersByTransactionsIdGroupId(userId, transactionId,
@@ -72,7 +63,7 @@ public class GetUserByTransactionIdGroup extends HttpServlet {
 					response.setStatus(groupResult.getKey());
 					out.print(groupResult.getValue());
 
-				} catch (JSONException e) {
+				} else{
 
 					// All the required data not found in the API body
 					response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

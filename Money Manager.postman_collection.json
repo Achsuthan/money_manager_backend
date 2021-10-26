@@ -707,7 +707,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionId\": \"TRA-11111155\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -715,12 +715,22 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/GetUserByTransacitonFriend",
+							"raw": "{{baseUrl}}/GetUserByTransacitonFriend?userId=USR-11111112&transactionId=TRA-11111155",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"GetUserByTransacitonFriend"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111112"
+								},
+								{
+									"key": "transactionId",
+									"value": "TRA-11111155"
+								}
 							]
 						}
 					},
@@ -736,7 +746,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"USR-11111112\",\n    \"transactionId\": \"TRA-11111145\",\n    \"groupId\": \"GRP-11111111\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -744,12 +754,26 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/GetUserByTransactionIdGroup",
+							"raw": "{{baseUrl}}/GetUserByTransactionIdGroup?userId=USR-11111112&transactionId=TRA-11111145&groupId=GRP-11111111",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"GetUserByTransactionIdGroup"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111112"
+								},
+								{
+									"key": "transactionId",
+									"value": "TRA-11111145"
+								},
+								{
+									"key": "groupId",
+									"value": "GRP-11111111"
+								}
 							]
 						}
 					},
