@@ -18,7 +18,7 @@ To run this project given list are requied
 
 After install all the required list and downloaded the jar files, import WAR file from this [link](https://drive.google.com/drive/folders/1VfbqS6EqD-igvIjagYqZ5q3H_nqUwy_v?usp=sharing) to Eclipse or NetBeans
 
-From the Msql Workbench, 
+In the Msql Workbench, 
 1. Create the schema called ```money_manager```
 2. Import the database files from this [link](https://drive.google.com/drive/folders/1ZDBvBMOvUQlhkXcjURqeiXEhwlBRnbo6?usp=sharing)
 
