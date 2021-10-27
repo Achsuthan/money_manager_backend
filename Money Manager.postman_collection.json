@@ -475,22 +475,26 @@
 					"response": []
 				},
 				{
-					"name": "Get All groups",
+					"name": "Get InviteDetails",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/create-group?userId=USR-11111111",
+							"raw": "{{baseUrl}}/GetLinkDetails?userId=USR-11111111&inviteId=INV-11111111",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"create-group"
+								"GetLinkDetails"
 							],
 							"query": [
 								{
 									"key": "userId",
 									"value": "USR-11111111"
+								},
+								{
+									"key": "inviteId",
+									"value": "INV-11111111"
 								}
 							]
 						}
@@ -815,6 +819,50 @@
 		},
 		{
 			"name": "Get Group Invite Link By Group ID",
+			"item": [
+				{
+					"name": "Get Group Invite Link By Group ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/GetGroupInviteLinkByGroupId?userId=USR-11111111&groupId=GRP-11111111",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"GetGroupInviteLinkByGroupId"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "USR-11111111"
+								},
+								{
+									"key": "groupId",
+									"value": "GRP-11111111"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Get Invite Details",
 			"item": [
 				{
 					"name": "Get Group Invite Link By Group ID",

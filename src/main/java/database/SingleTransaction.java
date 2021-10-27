@@ -60,12 +60,8 @@ public class SingleTransaction extends DatabaseConnector {
 			User user = new User();
 			if(user.CheckUserExist(userId)) {
 				
-				JSONArray transactionArray = getAllOwnTransaction(userId, transactionType);
-				JSONObject obj = new JSONObject();
-				obj.put("transactions", transactionArray);
-				remove();
-				return new Pair<Integer, String>(200,
-						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
+				return getAllOwnTransaction(userId, transactionType);
+				
 				
 			}else {
 				
@@ -220,7 +216,7 @@ public class SingleTransaction extends DatabaseConnector {
 		return rs;
 	}
 	
-	private JSONArray getAllOwnTransaction(String userId, String type) throws Exception {
+	private Pair<Integer, String> getAllOwnTransaction(String userId, String type) throws Exception {
 		
 		String selectStatement = "select * from transaction inner join category on(category.categoryId = transaction.categoryId) where transaction.userId= ? AND transaction.transactionTo=? order by transaction.date DESC;";
 
@@ -230,6 +226,8 @@ public class SingleTransaction extends DatabaseConnector {
 
 		ResultSet rs = prepStmt.executeQuery();
 		JSONArray returnResult = new JSONArray();
+		Double income = 0.0;
+		Double expenses = 0.0;
 		
 		while(rs.next()) {
 			JSONObject obj = new JSONObject();
@@ -242,6 +240,14 @@ public class SingleTransaction extends DatabaseConnector {
 			obj.put("amount", rs.getDouble("amount") < 0 ? -1 * rs.getDouble("amount") : rs.getDouble("amount"));
 			obj.put("isOwn", true);
 			
+			String transferType = rs.getString("transactionType").toLowerCase();
+			if(transferType.equals("income")) {
+				income += rs.getDouble("amount") < 0 ? -1 * rs.getDouble("amount") : rs.getDouble("amount");
+			}
+			else {
+				expenses += rs.getDouble("amount") < 0 ? -1 * rs.getDouble("amount") : rs.getDouble("amount");
+			}
+			
 			JSONObject cat = new JSONObject();
 			cat.put("categoryId", rs.getString("categoryId"));
 			cat.put("categoryName", rs.getString("categoryName"));
@@ -253,7 +259,14 @@ public class SingleTransaction extends DatabaseConnector {
 			
 			returnResult.put(obj);
 		}
-		return returnResult;
+		
+		JSONObject obj = new JSONObject();
+		obj.put("transactions", returnResult);
+		obj.put("income", income);
+		obj.put("expenses", expenses);
+		remove();
+		return new Pair<Integer, String>(200,
+				ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
 	}
 
 }
