@@ -55,34 +55,25 @@ public class FriendInvite extends DatabaseConnector {
 	
 	
 	// Create invite details
-	public Pair<Integer, String> getSingleFriendInviteDetails(String userId, String inviteId) {
+	public Pair<Integer, String> getSingleFriendInviteDetails(String inviteId) {
 
 		try {
 
-			User user = new User();
-			if (user.CheckUserExist(userId)) {
-				ResultSet rs = getSingleInvite(inviteId);
+			ResultSet rs = getSingleInvite(inviteId);
+			
+			if(rs.next()) {
+				JSONObject obj = new JSONObject();
+				obj.put("email", rs.getString("email"));
+				obj.put("inviteId", rs.getString("inviteId"));
 				
-				if(rs.next()) {
-					JSONObject obj = new JSONObject();
-					obj.put("email", rs.getString("email"));
-					obj.put("inviteId", rs.getString("inviteId"));
-					
-					remove();
-					return new Pair<Integer, String>(200,
-							ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
-				}
-				else {
-					remove();
-					return new Pair<Integer, String>(400,
-							ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.iviteNotExist));
-				}
-
-			} else {
-
+				remove();
+				return new Pair<Integer, String>(200,
+						ApiResponseHandler.apiResponse(ResponseType.SUCCESS, obj));
+			}
+			else {
 				remove();
 				return new Pair<Integer, String>(400,
-						ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.userNotExist));
+						ApiResponseHandler.apiResponse(ResponseType.FAILURE, InviteConstants.iviteNotExist));
 			}
 		} catch (Exception e) {
 

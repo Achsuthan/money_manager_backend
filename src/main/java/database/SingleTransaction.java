@@ -83,7 +83,7 @@ public class SingleTransaction extends DatabaseConnector {
 		
 		String transacitonId = getLastTransactionId();
 		
-		Double transactionAmount = 0.0;
+		Double transactionAmount = amount;
 		String transactionTypeUpperCase = transactionType.toUpperCase();
 		if(transactionTypeUpperCase.equals(TransactionConstrains.expenses) || transactionTypeUpperCase.equals(TransactionConstrains.transfer)) {
 			transactionAmount = -amount;
@@ -218,7 +218,7 @@ public class SingleTransaction extends DatabaseConnector {
 	
 	private Pair<Integer, String> getAllOwnTransaction(String userId, String type) throws Exception {
 		
-		String selectStatement = "select * from transaction inner join category on(category.categoryId = transaction.categoryId) where transaction.userId= ? AND transaction.transactionTo=? order by transaction.date DESC;";
+		String selectStatement = "select * from transaction inner join category on(category.categoryId = transaction.categoryId) where transaction.userId= ? AND transaction.transactionTo=? order by transaction.createdDate DESC;";
 
 		PreparedStatement prepStmt = con.prepareStatement(selectStatement);
 		prepStmt.setNString(1, userId);

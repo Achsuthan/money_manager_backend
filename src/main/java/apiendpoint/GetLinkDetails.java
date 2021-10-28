@@ -49,13 +49,12 @@ public class GetLinkDetails extends HttpServlet {
 			// Handle the session
 			if (TokenHanler.checkToken()) {
 
-				String userId = request.getParameter("userId");
 				String inviteId = request.getParameter("inviteId");
 
-				if (userId != null) {
+				if (inviteId != null) {
 
 					FriendInvite cat = new FriendInvite();
-					Pair<Integer, String> groupResult = cat.getSingleFriendInviteDetails(userId, inviteId);
+					Pair<Integer, String> groupResult = cat.getSingleFriendInviteDetails(inviteId);
 					response.setStatus(groupResult.getKey());
 					out.print(groupResult.getValue());
 				} else {

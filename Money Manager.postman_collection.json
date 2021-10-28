@@ -513,7 +513,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"personal\",\n    \"transactionType\": \"expenses\"\n}",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": \"13.01\",\n    \"date\": \"2021-10-28\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111111\",\n    \"transactionTo\": \"personal\",\n    \"transactionType\": \"expenses\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -539,7 +539,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 100.0,\n    \"date\": \"2021-10-20\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 90.0\n        }\n    ]\n}",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": \"100.0\",\n    \"date\": \"2021-10-20\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111114\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 90.0\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -565,7 +565,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": 12.0,\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"group\",\n    \"transactionType\": \"transfer\",\n    \"groupId\": \"GRP-11111111\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 80.0\n        },\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 20.0\n        }\n    ]\n}",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": \"12.0\",\n    \"date\": \"2021-10-12\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111112\",\n    \"transactionTo\": \"group\",\n    \"transactionType\": \"transfer\",\n    \"groupId\": \"GRP-11111111\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 80.0\n        },\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 20.0\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -882,21 +882,17 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/GetGroupInviteLinkByGroupId?userId=USR-11111111&groupId=GRP-11111111",
+							"raw": "{{baseUrl}}/GetLinkDetails?inviteId=INV-11111111",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"GetGroupInviteLinkByGroupId"
+								"GetLinkDetails"
 							],
 							"query": [
 								{
-									"key": "userId",
-									"value": "USR-11111111"
-								},
-								{
-									"key": "groupId",
-									"value": "GRP-11111111"
+									"key": "inviteId",
+									"value": "INV-11111111"
 								}
 							]
 						}

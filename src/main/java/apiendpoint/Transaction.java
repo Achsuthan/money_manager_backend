@@ -68,7 +68,7 @@ public class Transaction extends HttpServlet {
 				
 				String description = "";
 				String name = (String) jsonBody.get("name");
-				Double amount = (Double) jsonBody.get("amount");
+				double amount = Double.parseDouble((String) jsonBody.get("amount"));
 				String date =  (String) jsonBody.get("date");
 				String categoryId =  (String) jsonBody.get("categoryId");
 				String userId =  (String) jsonBody.get("userId");
