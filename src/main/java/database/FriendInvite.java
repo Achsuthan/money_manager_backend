@@ -302,7 +302,7 @@ public class FriendInvite extends DatabaseConnector {
 							
 							if (friedResult.getKey() == 200) {
 								
-								Pair<Integer, String> inviteResult = deleteInvite(inviteId, friendId);
+								Pair<Integer, String> inviteResult = deleteInvite(inviteId, userId);
 								
 								if (inviteResult.getKey() == 200) {
 									
@@ -476,7 +476,7 @@ public class FriendInvite extends DatabaseConnector {
 					String link = Helper.createInviteLink(singleInvite.getString("inviteId"));
 					obj.put("Link", link);
 					
-					Helper.sendMail(requestUserName + " send you the invitation link to join to Money Manger \nlink: "+ link,InviteConstants.registerSubject , email);
+					Helper.sendMail(requestUserName + " send you the invitation link to join to Money Manger \nlink: "+ InviteConstants.inviteBaseURL + link, "Mony Manager Invitation" , email);
 					remove();
 					return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
 							InviteConstants.inviteCreatedSuccessfully, obj));
