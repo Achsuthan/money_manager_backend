@@ -333,13 +333,16 @@ public class GroupTransaction extends DatabaseConnector {
 				obj.put("youReceive", youReceived);
 				
 				String groupName = "";
+				String groupUserId = "";
 				Group grp = new Group();
 				ResultSet grpRs = grp.getsingleGroup(groupId);
 				if(grpRs.next()) {
 					groupName = grpRs.getString("name");
+					groupUserId = grpRs.getString("createrId");
 				}
 				
 				obj.put("groupName", groupName);
+				obj.put("groupOwnerId", groupUserId);
 				
 				
 				return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
