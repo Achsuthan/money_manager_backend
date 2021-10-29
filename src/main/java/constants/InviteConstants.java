@@ -10,6 +10,7 @@ public class InviteConstants {
 	//Success 
 	public static String inviteCreatedSuccessfully = "Invite created successfully";
 	public static String inviteDeletedSuccessfully = "Invite deleted succssfully";
+	public static String inviteBaseURL = "http://localhost:8081/invite/";
 	
 	//Failure
 	public static String userNotExist = "The user is not exist in the system";
