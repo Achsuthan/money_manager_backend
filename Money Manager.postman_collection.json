@@ -539,7 +539,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": \"100.0\",\n    \"date\": \"2021-10-20\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111114\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 90.0\n        }\n    ]\n}",
+							"raw": "{\n    \"name\": \"Testing\",\n    \"amount\": \"100.0\",\n    \"date\": \"2021-10-20\",\n    \"categoryId\": \"CAT-11111111\",\n    \"userId\": \"USR-11111116\",\n    \"transactionTo\": \"friend\",\n    \"transactionType\": \"transfer\",\n    \"friends\": [\n        {\n            \"friendId\": \"USR-11111111\",\n            \"persentage\": 90.0\n        }\n    ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
