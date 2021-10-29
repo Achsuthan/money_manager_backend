@@ -459,10 +459,7 @@ public class GroupInvite extends DatabaseConnector {
 						receiverEmail = (String) receiverUser.get("email");
 					}
 
-					Helper.sendMail(
-							senderUsername + " invite you to the " + groupName + " Group"
-									+ "\n By clicking the link you can join to the group link: " + link,
-							"Group Invite", receiverEmail);
+					Helper.sendMail(senderUsername + " invite you to join to the " + groupName + " Group" + "\n You can view and accept the invitation from : " + InviteConstants.inviteBaseURL + "invites", "Group Invite" , receiverEmail);
 
 					remove();
 					return new Pair<Integer, String>(200, ApiResponseHandler.apiResponse(ResponseType.SUCCESS,
