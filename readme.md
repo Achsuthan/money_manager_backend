@@ -6,8 +6,8 @@ This project is developed by using
 
 The JAR file required to run this project 
 - Java JSON: Is used to convert the data in to JSON format when returning API response and Getting the body object [JAR](http://www.java2s.com/Code/Jar/j/Downloadjavajsonjar.htm)
-- MySQl Connector: Is required to connect the MySql with Java [JAR](https://dev.mysql.com/downloads/connector/j)
-- Mail: Is used to send the email to the user [JAR](https://static.javatpoint.com/src/mail/mailactivation.zip)
+- MySQL Connector: Is required to connect the MySql with Java [JAR](https://dev.mysql.com/downloads/connector/j)
+- Mail: This Is used to send the email to the users for the specific activites such as (Successfull registration, Friend invitation, Friend request accept, Invitation to join to the system and be as a friend to invitee) [JAR](https://static.javatpoint.com/src/mail/mailactivation.zip)
 
 To run this project given list are requied
 
@@ -26,4 +26,4 @@ In the Msql Workbench,
 
 All the API postman collection can be found from this [link](https://github.com/Achsuthan/money_manager_backend/blob/master/Money%20Manager.postman_collection.json)
 
-This project's frontend is build in with Vue.js,  the srouce code can be found [here](https://github.com/Achsuthan/money_manager_frontend) 
+This project's frontend is build in with Vue.js,  the srouce code can be found [here](https://github.com/Achsuthan/money_manager_frontend)
