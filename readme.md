@@ -24,6 +24,6 @@ In the Msql Workbench,
 1. Create the schema called ```money_manager```
 2. Import the database files from this [link](https://drive.google.com/drive/folders/1ZDBvBMOvUQlhkXcjURqeiXEhwlBRnbo6?usp=sharing)
 
-All the API postman collection can be found from this [link](https://github.com/Achsuthan/money_manager_backend/blob/master/Money%20Manager.postman_collection.json)
+All the API postman collection can be found from this [link](https://github.com/Achsuthan/money_manager_backend/blob/master/Money%20Manager.postman_collection.json). ```{{baseUrl}}``` should be set in the environment variable in the postman collection.
 
 This project's frontend is build in with Vue.js,  the srouce code can be found [here](https://github.com/Achsuthan/money_manager_frontend)
