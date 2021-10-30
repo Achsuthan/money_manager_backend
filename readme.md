@@ -26,4 +26,11 @@ In the Msql Workbench,
 
 All the API postman collection can be found from this [link](https://github.com/Achsuthan/money_manager_backend/blob/master/Money%20Manager.postman_collection.json). ```{{baseUrl}}``` should be set in the environment variable in the postman collection.
 
+
+Some of the dummy users are added to the database, 
+Email | password | 
+--- | --- |
+achsuthan@icloud.com | Pass@123 |
+achsuthan9314@gmail.com | Pass@123 |
+
 This project's frontend is build in with Vue.js,  the srouce code can be found [here](https://github.com/Achsuthan/money_manager_frontend)
